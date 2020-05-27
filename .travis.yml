@@ -6,8 +6,8 @@ matrix:
     - os: osx
       osx_image: xcode10.1
 language: c
-before_install:
-  - sudo apt-get install gfortran
+compiler:
+    - gcc
 script:
   - make
   - ./restricted_ESP_fit
