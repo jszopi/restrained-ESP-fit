@@ -13,7 +13,7 @@ config = {
     'url': 'https://github.com/jszopi/restrained_ESP_fit',
     'packages': [],
     'license': 'GPLv3',
-    'scripts': [],
+    'scripts': ["restrained_ESP_fit"],
 }
 
 setup(**config)
