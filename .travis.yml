@@ -6,7 +6,7 @@ matrix:
     - os: osx
       osx_image: xcode10.1
 compiler:
-    - gcc
+    - gfortran
 script:
   - make
-  - ./restricted_ESP_fit
+  - restricted_ESP_fit
