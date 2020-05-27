@@ -18,7 +18,7 @@ config = {
     'packages': [],
     'license': 'GPLv3',
     'entry_points': {
-        'console_scripts': "restrained_ESP_fit=restrained_ESP_fit:main"
+        'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit:main"]
     },
 }
 
