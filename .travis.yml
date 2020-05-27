@@ -5,8 +5,10 @@ matrix:
       dist: xenial
     - os: osx
       osx_image: xcode10.1
-compiler:
-    - gcc
 script:
   - make
-  - restricted_ESP_fit
+addons:
+    apt:
+        packages: gfortran
+    homebrew:
+        packages: gfortran
