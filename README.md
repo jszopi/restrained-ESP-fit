@@ -6,7 +6,8 @@ The mesh needs to be produced independently; see the [jszopi/repESP](https://git
 
 History prior to version 2.2 was not preserved (or rather, reconstructed, considering lack of a version controlled repo).
 This version was downloaded in May 2020 from https://upjv.q4md-forcefieldtools.org/RED/ together with other programs in q4md-fft tools 2.0.
-The original README for this version can be found in the [`README-2.4.txt` file](https://github.com/jszopi/resp/blob/master/README-2.4.txt) --- see for build instructions.
+The original README for this version can be found in the [`README-2.4.txt` file](https://github.com/jszopi/resp/blob/master/README-2.4.txt) — see for build instructions.
+Usage instructions are only available for version 2.2 and are hosted at https://upjv.q4md-forcefieldtools.org/RED/resp/ (if link is down, get your browser to display [the repo version](https://github.com/jszopi/resp/blob/566c9207b87ed37c6a8b2e47a581704db762f16c/resp-2.2.html)).
 
 I am hoping to rewrite this program in Python in order to encourage users to experiment with their own fitting methods.
 The code will thus soon be available in PyPI, possibly under a less generic name.
