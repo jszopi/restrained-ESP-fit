@@ -7,7 +7,7 @@ matrix:
       osx_image: xcode10.1
 script:
   - make
-  - bash restricted_ESP_fit
+  - ./restrained_ESP_fit
 addons:
     apt:
         packages: gfortran
