@@ -1,0 +1,5 @@
+      parameter (maxmol = 350) 
+      parameter (maxq   = 20*maxmol)
+      parameter (maxlgr = 3*maxmol)
+      parameter (maxtitle = 80)
+      parameter (maxchar = maxtitle*maxmol)
