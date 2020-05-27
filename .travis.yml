@@ -3,10 +3,13 @@ matrix:
   include:
     - os: linux
       dist: xenial
+      language: python
+      python: "3.7"
     - os: osx
       osx_image: xcode11.5
-language: python
-python: "3.8"
+      language: generic
+      env:
+        - TRAVIS_PYTHON_VERSION="3.7"
 script:
   - pip install -e .
   - restrained_ESP_fit
