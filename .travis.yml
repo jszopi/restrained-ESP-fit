@@ -1,11 +1,13 @@
-sudo: false
+sudo: required
 matrix:
   include:
     - os: linux
       dist: xenial
-      language: generic
     - os: osx
       osx_image: xcode10.1
-      language: generic
+language: c
+before_install:
+  - sudo apt-get install gfortran
 script:
-  make
+  - make
+  - ./restricted_ESP_fit
