@@ -17,9 +17,7 @@ config = {
     'url': 'https://github.com/jszopi/restrained_ESP_fit',
     'packages': [],
     'license': 'GPLv3',
-    'entry_points': {
-        'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit:main"]
-    },
+    'scripts': ["restrained_ESP_fit"],
 }
 
 setup(**config)
