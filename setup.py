@@ -1,8 +1,4 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
+from setuptools import setup
 import subprocess
 
 subprocess.run(["make"]).check_returncode()
