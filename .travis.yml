@@ -11,7 +11,7 @@ matrix:
       env:
         - TRAVIS_PYTHON_VERSION="3.7"
 script:
-  - pip install -e .
+  - pip3 install -e .
   - restrained_ESP_fit
 addons:
     apt:
