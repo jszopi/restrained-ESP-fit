@@ -6,7 +6,7 @@ except ImportError:
 import subprocess
 
 subprocess.run("make").check_returncode()
-subprocess.run("./restrained_ESP_fit").check_returncode()
+subprocess.run("./restrained_ESP_fit").check_returncode()  # Always returns 0
 
 config = {
     'name': 'restrained_ESP_fit',
