@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jszopi/restrained_ESP_fit.svg?branch=master)](https://travis-ci.org/jszopi/restrained_ESP_fit)
+
 # restrained_ESP_fit
 
 This is a fork of the `resp` program commonly used in computational chemistry for fitting partial charges to values of the provided molecular Electrostatic Potential (ESP) field around a molecule.
