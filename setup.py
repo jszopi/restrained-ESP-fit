@@ -13,8 +13,8 @@ config = {
     'description': 'Fitting partial charges to molecular Electrostatic Potential field',
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
-    'author': 'Jan Szopinski',
-    'author_email': 'jszopi@users.noreply.github.com',
+    'maintainer': 'Jan Szopinski',
+    'maintainer_email': 'jszopi@users.noreply.github.com',
     'url': 'https://github.com/jszopi/restrained_ESP_fit',
     'license': 'GPLv3',
     # Probably not the best way of making the `resp` binary accessible:
