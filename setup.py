@@ -9,7 +9,7 @@ subprocess.run(["mv", "resp.o", "resp", "restrained_ESP_fit"]).check_returncode(
 
 config = {
     'name': 'restrained_ESP_fit',
-    'version': '2.4.1',
+    'version': '2.4.4',
     'description': 'Fitting partial charges to molecular Electrostatic Potential field',
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
