@@ -11,10 +11,20 @@ matrix:
       env:
         - TRAVIS_PYTHON_VERSION="3.7"
 script:
-  - pip3 install -e .
+  - pip3 install -ve .
   - restrained_ESP_fit  # The target `resp` binary always returns 0
 addons:
     apt:
         packages: gfortran
     homebrew:
         packages: gfortran
+deploy:
+    provider: pypi
+    server: https://test.pypi.org/legacy/
+    username: "__token__"
+    password: $TEST_PYPI_TOKEN
+    distributions: "sdist bdist_wheel"
+    skip_existing: true
+    edge: true # opt in to dpl v2
+    on:
+        tags: true
