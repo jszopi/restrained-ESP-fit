@@ -25,5 +25,6 @@ deploy:
     password: $TEST_PYPI_TOKEN
     distributions: "sdist bdist_wheel"
     skip_existing: true
+    edge: true # opt in to dpl v2
     on:
         tags: true
