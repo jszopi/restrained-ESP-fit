@@ -10,10 +10,12 @@ matrix:
       language: shell
       env: PYENV_VERSION='3.7.7' PYENV_VERSION_STRING='Python 3.7.7'
       before_install:
-        - which python
+        - python --version
+        - pip --version
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
-        - which python
+        - python --version
+        - pip --version
 cache:
   - directories:
     - $HOME/.pyenv_cache
