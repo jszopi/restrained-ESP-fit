@@ -7,15 +7,14 @@ matrix:
       python: "3.7"
     - os: osx
       osx_image: xcode11.5
-      language: shell
+      language: generic
+      # Use praekeltfoundation/travis-pyenv to workaround Travis not supporting
+      # Python builds on MacOS out of the box. (The issue was that Python 2.7
+      # was being picked up during the deploy step).
       env: PYENV_VERSION='3.7.7' PYENV_VERSION_STRING='Python 3.7.7'
       before_install:
-        - python --version
-        - pip --version
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
-        - python --version
-        - pip --version
 cache:
   - directories:
     - $HOME/.pyenv_cache
