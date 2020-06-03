@@ -8,8 +8,15 @@ matrix:
     - os: osx
       osx_image: xcode11.5
       language: shell
+      env: PYENV_VERSION='3.7.7' PYENV_VERSION_STRING='Python 3.7.7'
       before_install:
-        - which python3
+        - which python
+        - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
+        - source setup-pyenv.sh
+        - which python
+cache:
+  - directories:
+    - $HOME/.pyenv_cache
 script:
   - pip3 install -ve .
   - restrained_ESP_fit  # The target `resp` binary always returns 0
