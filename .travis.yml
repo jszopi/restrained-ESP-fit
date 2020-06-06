@@ -23,7 +23,7 @@ matrix:
       install:
         - docker pull $DOCKER_IMAGE
       script:
-        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE python --version
+        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE ls /opt/python/
 cache:
   - directories:
     - $HOME/.pyenv_cache
