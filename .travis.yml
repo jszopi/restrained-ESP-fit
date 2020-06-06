@@ -23,8 +23,7 @@ matrix:
       install:
         - docker pull $DOCKER_IMAGE
       script:
-        - ls dist/
-        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /opt/python/cp37-cp37m setup.py sdist bdist_wheel
+        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE ls /opt/python/cp37-cp37m
         - ls dist/
 cache:
   - directories:
