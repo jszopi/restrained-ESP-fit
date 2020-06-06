@@ -10,7 +10,7 @@ subprocess.run(["mv", "resp.o", "resp", "restrained_ESP_fit"]).check_returncode(
 
 class BinaryDistribution(Distribution):
     def has_ext_modules():
-        return True:
+        return True
 
 
 config = {
