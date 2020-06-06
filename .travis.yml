@@ -25,6 +25,7 @@ matrix:
         - docker pull $DOCKER_IMAGE
       script:
         - wget https://raw.githubusercontent.com/pypa/python-manylinux-demo/84dc72039a0c85c1c960e024f024fd3d37387634/travis/build-wheels.sh
+        - chmod +x build-wheels.sh
         - docker run --rm -e PLAT=$PLAT -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/build-wheels.sh
         - ls wheelhouse/
 cache:
