@@ -19,13 +19,11 @@ matrix:
     - services:
         - docker
       env: DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
-           PLAT=manylinux2014_x86_64
            PYPI_DEPLOY=1
       install:
         - docker pull $DOCKER_IMAGE
       script:
-        - docker run --rm -e PLAT=$PLAT -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
-        - ls wheelhouse/
+        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE python --version
 cache:
   - directories:
     - $HOME/.pyenv_cache
@@ -46,5 +44,5 @@ deploy:
     skip_existing: true
     edge: true # opt in to dpl v2
     on:
-        tags: true
+        branch: travis-publish-pypi
         condition: $PYPI_DEPLOY = 1
