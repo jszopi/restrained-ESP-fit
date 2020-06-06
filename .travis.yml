@@ -5,13 +5,14 @@ matrix:
       dist: xenial
       language: python
       python: "3.7"
+      env: PYPI_DEPLOY=0  # Linux binary wheel must be created using a manylinux docker image, see below
     - os: osx
       osx_image: xcode11.5
       language: generic
       # Use praekeltfoundation/travis-pyenv to workaround Travis not supporting
       # Python builds on MacOS out of the box. (The issue was that Python 2.7
       # was being picked up during the deploy step).
-      env: PYENV_VERSION='3.7.7' PYENV_VERSION_STRING='Python 3.7.7'
+      env: PYENV_VERSION='3.7.7' PYENV_VERSION_STRING='Python 3.7.7' PYPI_DEPLOY=1
       before_install:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
@@ -19,6 +20,7 @@ matrix:
         - docker
       env: DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
            PLAT=manylinux2014_x86_64
+           PYPI_DEPLOY=1
       install:
         - docker pull $DOCKER_IMAGE
       script:
@@ -46,4 +48,4 @@ deploy:
     edge: true # opt in to dpl v2
     on:
         tags: true
-        condition: os != linux
+        condition: $PYPI_DEPLOY = 1
