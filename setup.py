@@ -9,7 +9,7 @@ subprocess.run(["mv", "resp.o", "resp", "restrained_ESP_fit"]).check_returncode(
 
 
 class BinaryDistribution(Distribution):
-    def has_ext_modules():
+    def has_ext_modules(_):  # I think this takes no arguments in Python 3.8
         return True
 
 
