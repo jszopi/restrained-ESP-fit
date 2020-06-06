@@ -23,7 +23,7 @@ matrix:
       install:
         - docker pull $DOCKER_IMAGE
       script:
-        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE ls /opt/python/cp37-cp37m/bin
+        - docker run --rm -v `pwd`:/io $DOCKER_IMAGE /opt/python/cp37-cp37m/bin/python --version
         - ls dist/
 cache:
   - directories:
