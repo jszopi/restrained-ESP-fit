@@ -27,6 +27,6 @@ done
 
 # Install packages and test
 for PYBIN in /opt/python/*/bin/; do
-    "${PYBIN}/pip" install python-manylinux-demo --no-index -f /io/wheelhouse
+    "${PYBIN}/pip" install restrained-ESP-fit --no-index -f /io/wheelhouse
     # (cd "$HOME"; "${PYBIN}/nosetests" pymanylinuxdemo)
 done
