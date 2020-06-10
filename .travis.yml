@@ -27,7 +27,7 @@ matrix:
             docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c '
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
             "$PYBIN"/pip wheel /io/ --no-deps -w wheelhouse/ &&
-            WHEEL="/io/$(ls wheelhouse/*.whl)" &&
+            WHEEL="$(ls wheelhouse/*.whl)" &&
             auditwheel show "$WHEEL" &&
             auditwheel repair "$WHEEL" --plat manylinux2014_x86_64 -w /io/wheelhouse/ &&
             "$PYBIN"/pip install restrained-ESP-fit --no-index -f /io/wheelhouse
