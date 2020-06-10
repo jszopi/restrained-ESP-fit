@@ -31,8 +31,6 @@ matrix:
             WHEEL="/io/wheelhouse/$(ls wheelhouse/*.whl)" &&
             auditwheel show "$WHEEL" &&
             auditwheel repair "$WHEEL" --plat manylinux2014_x86_64 -w /io/wheelhouse/ &&
-            # Should this be in an svenv, or does `pip wheel` above ensure
-            # it is not installed?
             "$PYBIN"/pip install restrained-ESP-fit --no-index -f /io/wheelhouse
             # TODO: Move this to the common script section, along with a test
             # invocation and publishing (including an sdist).
