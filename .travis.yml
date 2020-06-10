@@ -30,7 +30,7 @@ matrix:
             auditwheel show "$WHEEL" &&
             auditwheel repair "$WHEEL" --plat manylinux2014_x86_64 -w /io/wheelhouse/
             # Should this be in an svenv, or does `pip3 wheel` above ensure
-            # it's not installed?
+            # it is not installed?
             pip3 install restrained-ESP-fit --no-index -f /io/wheelhouse
             # TODO: Move this to the common script section, along with a test
             # invocation.
