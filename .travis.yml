@@ -25,10 +25,13 @@ matrix:
       script:
         - >
             docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c '
+            set -x &&
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
+            ls &&
+            ls /io &&
             "$PYBIN"/pip install pep517 &&
-            "$PYBIN"/python -m pep517.build --source --binary . &&
-            ls -l dist/ &&
+            "$PYBIN"/python -m pep517.build --source --binary /io/ &&
+            ls -l /io/dist/ &&
             WHEEL="$(ls dist/*.whl)" &&
             auditwheel show "$WHEEL" &&
             auditwheel repair "$WHEEL" --plat manylinux2014_x86_64 -w /io/dist/ &&
