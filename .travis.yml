@@ -24,17 +24,14 @@ matrix:
         - docker pull $DOCKER_IMAGE
       script:
         - >
-            docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c '
-            set -x &&
+            docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
             "$PYBIN"/pip install pep517 &&
             "$PYBIN"/python -m pep517.build --source --binary /io/ &&
-            WHEEL="$(ls /io/dist/*.whl)" &&
-            auditwheel show "$WHEEL" &&
-            auditwheel repair "$WHEEL" --plat manylinux2014_x86_64 -w /io/dist/ &&
-            "$PYBIN"/pip install restrained-ESP-fit --no-index -f /io/dist/
-            # TODO: Move this to the common script section, along with a test
-            # invocation and publishing (including an sdist).
+            ORIGINAL_WHEEL="$(ls /io/dist/*.whl)" &&
+            auditwheel show "$ORIGINAL_WHEEL" &&
+            auditwheel repair "$ORIGINAL_WHEEL" --plat manylinux2014_x86_64 -w /io/dist/ &&
+            rm "$ORIGINAL_WHEEL"
             '
         - ls dist/
 cache:
