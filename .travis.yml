@@ -22,7 +22,7 @@ matrix:
       python: "3.7"
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
            PYPI_DEPLOY=1
       install:
         - docker pull $DOCKER_IMAGE
@@ -38,7 +38,7 @@ matrix:
             "$PYBIN"/python -c "import sys; import os; import subprocess; print(subprocess.run([\"ldd\", os.path.join(sys.prefix, \"resp\")]).stdout)" &&
             "$PYBIN"/pip uninstall --yes restrained-ESP-fit &&
             auditwheel show "$ORIGINAL_WHEEL" &&
-            auditwheel repair "$ORIGINAL_WHEEL" --plat manylinux2014_x86_64 -w /io/dist/ &&
+            auditwheel repair "$ORIGINAL_WHEEL" --plat manylinux1_x86_64 -w /io/dist/ &&
             rm "$ORIGINAL_WHEEL" &&
             "$PYBIN"/pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f /io/dist/ &&
             "$PYBIN"/python -c "import sys; import os; import subprocess; print(subprocess.run([\"ldd\", os.path.join(sys.prefix, \"resp\")]).stdout)"
