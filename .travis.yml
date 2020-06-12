@@ -46,8 +46,10 @@ script:
   - if [[ ! -d dist ]] ; then pip install pep517 && python -m pep517.build --source --binary . ; fi
   - ls dist/
   - python -c "import sys; import os; import subprocess; print(subprocess.run(['ldd', 'resp']).stdout)"
+  - ls /usr/lib/x86_64-linux-gnu/*fortran*
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
   - python -c "import sys; import os; import subprocess; print(subprocess.run(['ldd', os.path.join(sys.prefix, 'resp')]).stdout)"
+  - ls /usr/lib/x86_64-linux-gnu/*fortran*
   - restrained_ESP_fit  # The target `resp` binary always returns 0
   - pip install twine
   - twine check dist/*
