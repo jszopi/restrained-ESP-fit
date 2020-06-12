@@ -30,7 +30,7 @@ matrix:
         - >
             docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
-            ls /usr/lib/x86_64-linux-gnu/*fortran* &&
+            find / -name "*libgfortran*" ;
             "$PYBIN"/pip install pep517 &&
             auditwheel --version &&
             "$PYBIN"/pip install --upgrade auditwheel &&
