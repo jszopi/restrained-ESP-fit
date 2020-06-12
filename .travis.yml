@@ -17,7 +17,7 @@ matrix:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
     - os: linux
-      dist: xenial
+      dist: bionic
       language: python
       python: "3.7"
       services:
