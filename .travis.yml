@@ -36,7 +36,7 @@ matrix:
             ORIGINAL_WHEEL="$(ls /io/dist/*.whl)" &&
             "$PYBIN"/pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f /io/dist/ &&
             "$PYBIN"/python -c "import sys; import os; import subprocess; print(subprocess.run([\"ldd\", os.path.join(sys.prefix, \"resp\")]).stdout)" &&
-            "$PYBIN"/pip uninstall restrained-ESP-fit &&
+            "$PYBIN"/pip uninstall --yes restrained-ESP-fit &&
             auditwheel show "$ORIGINAL_WHEEL" &&
             auditwheel repair "$ORIGINAL_WHEEL" --plat manylinux2010_x86_64 -w /io/dist/ &&
             rm "$ORIGINAL_WHEEL" &&
