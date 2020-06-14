@@ -13,7 +13,7 @@ SRCS= resp.f
 LIB= shared_variables.h
 
 resp:	$(OBJS) 
-	$(FC) $(OBJS) -o resp
+	$(FC) $(OBJS) -static -o resp
 
 $(OBJS): $(SRCS) $(LIB)
 	$(FC) $(FLAGS) $(SRCS)
