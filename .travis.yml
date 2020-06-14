@@ -36,7 +36,7 @@ matrix:
             ORIGINAL_WHEEL="$(ls /io/dist/*.whl)" &&
             auditwheel show "$ORIGINAL_WHEEL" &&
             auditwheel repair "$ORIGINAL_WHEEL" --plat manylinux2014_x86_64 -w /io/dist/ &&
-            rm "$ORIGINAL_WHEEL" &&
+            rm "$ORIGINAL_WHEEL"
             '
 cache:
   - directories:
