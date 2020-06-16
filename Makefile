@@ -1,6 +1,6 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = gcc
+FC = gfortran
 
 FLAGS = -c -O2
 # -mcmodel=medium
@@ -8,13 +8,27 @@ FLAGS = -c -O2
 # allows handling of a larger number of MEP on 64 bit system
 # FLAGS = -c -mcmodel=medium -O2
 
-OBJS= resp.o  
+OBJS= resp.o
 SRCS= resp.f
 LIB= shared_variables.h
 
-resp:	$(OBJS) 
+
+ifeq ($(shell uname -s),Linux)
+	VPATH_DIR = /usr/lib/gcc/x86_64-linux-gnu/9
+else
+	VPATH_DIR = /opt/local/lib
+	FLAGS += -dynamiclib
+endif
+
+vpath %.a $(VPATH_DIR)
+
+STATICLIBS = -lgfortran -lquadmath
+.LIBPATTERNS = lib%.a lib%.dylib lib%.so
+
+resp:	$(OBJS) $(STATICLIBS)
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
-	$(FC) $(OBJS) -Wl,-Bstatic -lgfortran -lquadmath -Wl,-Bdynamic -lm -o resp
+	# and https://stackoverflow.com/a/5583245
+	$(FC) $^ -lm -o resp
 
 $(OBJS): $(SRCS) $(LIB)
 	$(FC) $(FLAGS) $(SRCS)
