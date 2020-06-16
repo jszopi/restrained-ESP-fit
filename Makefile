@@ -14,7 +14,7 @@ LIB= shared_variables.h
 
 resp:	$(OBJS) 
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
-	$(FC) $(OBJS) -Wl,-Bstatic -lgfortran -lquadmath -Wl,-Bdynamic -o resp
+	$(FC) $(OBJS) -Wl,-Bstatic -lgfortran -lquadmath -Wl,-Bdynamic -lm -o resp
 
 $(OBJS): $(SRCS) $(LIB)
 	$(FC) $(FLAGS) $(SRCS)
