@@ -12,12 +12,6 @@ OBJS= resp.o
 SRCS= resp.f
 LIB= shared_variables.h
 
-
-ifeq ($(shell uname -s),Linux)
-else
-	FLAGS += -dynamiclib
-endif
-
 vpath %.a $(VPATH_DIR)
 
 STATICLIBS = -lgfortran -lquadmath
