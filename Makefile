@@ -1,8 +1,8 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = gcc
+FC = gfortran
 
-FLAGS = -c -O2
+FLAGS = -c -O2 -v
 # -mcmodel=medium
 # option for gfortran
 # allows handling of a larger number of MEP on 64 bit system
@@ -14,8 +14,7 @@ LIB= shared_variables.h
 
 vpath %.a $(VPATH_DIR)
 
-STATICLIBS = -lgfortran -lquadmath
-.LIBPATTERNS = lib%.a lib%.dylib lib%.so
+STATICLIBS = libgfortran.a libquadmath.a
 
 resp:	$(OBJS) $(STATICLIBS)
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
