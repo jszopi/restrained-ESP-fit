@@ -26,7 +26,7 @@ matrix:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
         - brew update
-        - brew tap homebrew/versions
+        - brew tap homebrew/homebrew-core
         - brew install gcc49
         - brew info gcc49
     - name: manylinux2014
