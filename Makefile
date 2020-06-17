@@ -1,7 +1,3 @@
-
-# Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = gcc
-
 FLAGS = -c -O2 -v
 # -mcmodel=medium
 # option for gfortran
@@ -20,10 +16,10 @@ STATICLIBS = -lgfortran -lquadmath
 resp:	$(OBJS) $(STATICLIBS)
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
 	# and https://stackoverflow.com/a/5583245
-	$(FC) $^ -lm -o resp
+	$(FORTRAN_COMPILER) $^ -lm -o resp
 
 $(OBJS): $(SRCS) $(LIB)
-	$(FC) $(FLAGS) $(SRCS)
+	$(FORTRAN_COMPILER) $(FLAGS) $(SRCS)
 
 clean:
 	rm -rf $(OBJS) resp

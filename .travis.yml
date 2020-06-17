@@ -10,6 +10,7 @@ matrix:
           # Linux binary wheel must be created using a manylinux docker image, see below
           PYPI_DEPLOY=0
           VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/5
+          FORTRAN_COMPILER=gcc
     - name: macOS 10.15.14 with Xcode 11.6
       os: osx
       osx_image: xcode11.6
@@ -22,6 +23,7 @@ matrix:
           PYENV_VERSION_STRING='Python 3.7.7'
           PYPI_DEPLOY=1
           VPATH_DIR=/usr/local/Cellar/gcc/9.3.0_1/lib/gcc/9
+          FORTRAN_COMPILER=/usr/local/bin/gcc-4.9
       before_install:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
@@ -35,6 +37,7 @@ matrix:
            DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
            PYPI_DEPLOY=1
            VPATH_DIR/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+           FORTRAN_COMPILER=gcc
       install:
         - docker pull $DOCKER_IMAGE
       before_script:
@@ -54,14 +57,8 @@ cache:
 script:
   # Build only if artifacts not already present (as will be the case with the
   # manylinux build, which requires post-processing in container).
-  - which gfortran
-  - ls -l $(which gfortran)
-  - gfortran --version
-  - which gcc
-  - ls -l $(which gcc)
-  - gcc --version
-  - find /usr/local/bin -name "gcc*" 2>/dev/null
-  - for x in /usr/local/bin/gcc* ; do "$x" --version ; done
+  - $(FORTRAN_COMPILER) --version
+  - find /usr/local/bin -name "libgfortran.a" 2>/dev/null
   - if [[ ! -d dist ]] ; then pip install pep517 && python -m pep517.build --source --binary . ; fi
   - ldd resp || otool -L resp
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
