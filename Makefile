@@ -1,6 +1,6 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = gfortran
+FC = /usr/local/Cellar/gcc/9.3.0_1/bin/gfortran
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
