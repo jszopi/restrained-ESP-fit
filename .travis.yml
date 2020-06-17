@@ -37,7 +37,7 @@ matrix:
            DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
            PYPI_DEPLOY=1
            FORTRAN_COMPILER=gcc
-           VPATH_DIR/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+           VPATH_DIR=/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
       install:
         - docker pull $DOCKER_IMAGE
       before_script:
