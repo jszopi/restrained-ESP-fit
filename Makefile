@@ -14,7 +14,8 @@ LIB= shared_variables.h
 
 vpath %.a $(VPATH_DIR)
 
-STATICLIBS = libgfortran.a libquadmath.a
+STATICLIBS = -lgfortran -lquadmath
+.LIBPATTERNS = lib%.a lib%.dylib lib%.so
 
 resp:	$(OBJS) $(STATICLIBS)
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
