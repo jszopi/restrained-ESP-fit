@@ -9,7 +9,7 @@ matrix:
       env:
           # Linux binary wheel must be created using a manylinux docker image, see below
           PYPI_DEPLOY=0
-          VPATH_DIR='/usr/lib/gcc/x86_64-linux-gnu/5'
+          VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/5
     - name: macOS 10.15.14 with Xcode 11.5
       os: osx
       osx_image: xcode11.5
@@ -21,7 +21,7 @@ matrix:
           PYENV_VERSION='3.7.7'
           PYENV_VERSION_STRING='Python 3.7.7'
           PYPI_DEPLOY=1
-          VPATH_DIR='/usr/local/Cellar/gcc/9.3.0_1/lib/gcc/9'
+          VPATH_DIR=/usr/local/Cellar/gcc/9.3.0_1/lib/gcc/9
       before_install:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
@@ -31,15 +31,15 @@ matrix:
       python: "3.7"
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
+      env:
+           DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
            PYPI_DEPLOY=1
+           VPATH_DIR/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
       install:
         - docker pull $DOCKER_IMAGE
       before_script:
         - >
-            docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
-            find / -name libgfortran.a 2>/dev/null &&
-            find / -name libquadmath.a 2>/dev/null &&
+            docker run --rm -e VPATH_DIR="$VPATH_DIR" -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
             "$PYBIN"/pip install pep517 &&
             "$PYBIN"/python -m pep517.build --source --binary /io/ &&
