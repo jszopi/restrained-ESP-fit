@@ -1,6 +1,6 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = gfortran
+FC = gcc
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
@@ -13,9 +13,9 @@ SRCS= resp.f
 LIB= shared_variables.h
 
 vpath %.a $(VPATH_DIR)
+.LIBPATTERNS = lib%.a lib%.dylib lib%.so
 
 STATICLIBS = -lgfortran -lquadmath
-.LIBPATTERNS = lib%.a lib%.dylib lib%.so
 
 resp:	$(OBJS) $(STATICLIBS)
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
