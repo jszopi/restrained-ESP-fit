@@ -25,6 +25,10 @@ matrix:
       before_install:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
+        - brew update
+        - brew tap homebrew/versions
+        - brew install gcc49
+        - brew info gcc49
     - name: manylinux2014
       dist: bionic
       language: python
@@ -60,8 +64,8 @@ script:
   - which gcc
   - ls -l $(which gcc)
   - gcc --version
-  - find /usr/local/bin -name gcc 2>/dev/null
-  - /usr/local/bin/gcc --version
+  - find /usr/local/bin -name "gcc*" 2>/dev/null
+  - for x in /usr/local/bin/gcc* ; do "$x" --version ; done
   - if [[ ! -d dist ]] ; then pip install pep517 && python -m pep517.build --source --binary . ; fi
   - ldd resp || otool -L resp
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
@@ -73,5 +77,3 @@ script:
 addons:
     apt:
         packages: gfortran
-    homebrew:
-        packages: gcc
