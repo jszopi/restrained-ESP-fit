@@ -16,7 +16,7 @@ matrix:
       osx_image: xcode11.6
       language: generic
       # Use praekeltfoundation/travis-pyenv to workaround Travis not supporting
-      # Python builds on MacOS out of the box. (The issue was that Python 2.7
+      # Python builds on macOS out of the box. (The issue was that Python 2.7
       # was being picked up during the deploy step).
       env:
           PYENV_VERSION='3.7.7'
@@ -42,7 +42,7 @@ matrix:
         - docker pull $DOCKER_IMAGE
       before_script:
         - >
-            docker run --rm -e VPATH_DIR="$VPATH_DIR" -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
+            docker run --rm -e VPATH_DIR="$VPATH_DIR" -e FORTRAN_COMPILER="$FORTRAN_COMIPILER" -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
             "$PYBIN"/pip install pep517 &&
             "$PYBIN"/python -m pep517.build --source --binary /io/ &&
