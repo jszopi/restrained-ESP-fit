@@ -42,7 +42,7 @@ matrix:
         - docker pull $DOCKER_IMAGE
       before_script:
         - >
-            docker run --rm -e VPATH_DIR="$VPATH_DIR" -e FORTRAN_COMPILER="$FORTRAN_COMIPILER" -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
+            docker run --rm -e VPATH_DIR="$VPATH_DIR" -e FORTRAN_COMPILER="$FORTRAN_COMPILER" -v `pwd`:/io $DOCKER_IMAGE /bin/bash -xc '
             PYBIN="/opt/python/cp37-cp37m/bin/" &&
             "$PYBIN"/pip install pep517 &&
             "$PYBIN"/python -m pep517.build --source --binary /io/ &&
