@@ -1,6 +1,6 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = /usr/local/Cellar/gcc/9.3.0_1/bin/gfortran
+FC = gfortran
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
@@ -20,7 +20,7 @@ STATICLIBS = -lgfortran -lquadmath
 resp:	$(OBJS) $(STATICLIBS)
 	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
 	# and https://stackoverflow.com/a/5583245
-	$(FC) $^ -lm -o resp
+	$(FC) -static-libgfortran -static-libgcc $^ -lm -o resp
 
 $(OBJS): $(SRCS) $(LIB)
 	$(FC) $(FLAGS) $(SRCS)
