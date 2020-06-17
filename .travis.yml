@@ -10,9 +10,9 @@ matrix:
           # Linux binary wheel must be created using a manylinux docker image, see below
           PYPI_DEPLOY=0
           VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/5
-    - name: macOS 10.15.14 with Xcode 11.5
+    - name: macOS 10.15.14 with Xcode 11.6
       os: osx
-      osx_image: xcode11.5
+      osx_image: xcode11.6
       language: generic
       # Use praekeltfoundation/travis-pyenv to workaround Travis not supporting
       # Python builds on MacOS out of the box. (The issue was that Python 2.7
