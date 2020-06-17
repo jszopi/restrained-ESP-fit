@@ -74,4 +74,4 @@ addons:
     apt:
         packages: gfortran
     homebrew:
-        packages: gcc gfortran
+        packages: gcc
