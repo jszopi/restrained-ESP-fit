@@ -25,10 +25,6 @@ matrix:
       before_install:
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
-        - brew update
-        - brew tap homebrew/homebrew-core
-        - brew install gcc49
-        - brew info gcc49
     - name: manylinux2014
       dist: bionic
       language: python
@@ -77,3 +73,5 @@ script:
 addons:
     apt:
         packages: gfortran
+    homebrew:
+        packages: gcc@4.9
