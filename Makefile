@@ -14,9 +14,7 @@ LIB= shared_variables.h
 
 
 ifeq ($(shell uname -s),Linux)
-	VPATH_DIR = /usr/lib/gcc/x86_64-linux-gnu/9
 else
-	VPATH_DIR = /usr/local/Cellar/gcc/9.3.0_1/lib/gcc/9
 	FLAGS += -dynamiclib
 endif
 
