@@ -27,6 +27,7 @@ matrix:
         - source setup-pyenv.sh
         # Using an older gcc because newer ones actually use clang and I
         # wasn't able to statically link libquadmath with it.
+        - shopt -s expand_aliases  # https://github.com/travis-ci/travis-ci/issues/2552#issuecomment-200640335
         - alias gcc=/usr/local/bin/gcc-4.9
     - name: manylinux2014
       dist: bionic
