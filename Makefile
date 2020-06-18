@@ -13,14 +13,16 @@ OBJS= resp.o
 SRCS= resp.f
 LIB= shared_variables.h
 
+# A trick to statically link selected libraries, which works on macOS,
+# since the -Wl,Bstatic/dynamic approach only works with the GNU `ld`.
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
+# and https://stackoverflow.com/a/5583245
 vpath %.a $(VPATH_DIR)
 .LIBPATTERNS = lib%.a lib%.dylib lib%.so
-
 STATICLIBS = -lgfortran -lquadmath
 
 resp:	$(OBJS) $(STATICLIBS)
-	# Based on: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
-	# and https://stackoverflow.com/a/5583245
+	# -lm is needed on Linux per https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
 	$(FC) $^ -lm -o resp
 
 $(OBJS): $(SRCS) $(LIB)

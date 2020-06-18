@@ -2,7 +2,7 @@ matrix:
   include:
     - name: Quick Linux build
       os: linux
-      dist: xenial
+      dist: xenial  # Ubuntu 16.04, reasonably old and LTS
       language: python
       python: "3.7"
       env:
@@ -10,7 +10,7 @@ matrix:
         # see build job below.
         - PYPI_DEPLOY=0
         - VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/5
-    - name: macOS 10.15.14 with Xcode 11.6
+    - name: macOS 10.15.4 with Xcode 11.6
       os: osx
       osx_image: xcode11.6
       language: generic
