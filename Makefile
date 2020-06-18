@@ -1,7 +1,7 @@
 # Fortran compiler. Only gfortran is compatible with the flags used here and
 # the cross-platform build environments in Travis CI. Specifically, the
 # invocation via gcc is due to an issue with static linking on macOS.
-FC = gcc
+FC = $(or $(GCC_OVERRIDE),gcc) 
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
