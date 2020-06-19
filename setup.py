@@ -6,11 +6,6 @@ with open("README.md", "r") as fh:
 
 subprocess.run(["make"]).check_returncode()
 
-class BinaryDistribution(Distribution):
-    def has_ext_modules(_):  # I think this takes no arguments in Python 3.8
-        return True
-
-
 config = {
     'name': 'restrained_ESP_fit',
     'version': '2.4.10',
@@ -26,7 +21,6 @@ config = {
     'entry_points': {
         'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit.resp_wrapper:main"],
     },
-    'distclass': BinaryDistribution
 }
 
 setup(**config)
