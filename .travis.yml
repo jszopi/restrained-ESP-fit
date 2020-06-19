@@ -73,6 +73,10 @@ script:
   # TODO: Add some tests
   - pip install twine
   - twine check dist/*
+after_success:
+  - echo "Successful build"
+  - ls dist
+  - git tag --points-at HEAD
   # TODO: Try to only deploy tagged commits (and when PYPI_DEPLOY variable is set)
   # and only if all above commands worked.
   # - twine upload --skip-existing --repository-url https://test.pypi.org/legacy -u "__token__" -p "$TEST_PYPI_TOKEN" dist/*
