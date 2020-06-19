@@ -76,9 +76,8 @@ script:
 after_success:
   - echo "Successful build"
   - ls dist
-  - git tag --points-at HEAD
-  # TODO: Try to only deploy tagged commits (and when PYPI_DEPLOY variable is set)
-  # and only if all above commands worked.
+  - if [[ $(git tag --points-at HEAD | head -c1 | wc -c) -ne 0 ]] ; then echo "Tagged commit" ; else echo "Commit not tagged" ; fi
+  - if [[ $(git tag --points-at HEAD | head -c1 | wc -c) -ne 0 && "$PYPI_DEPLOY" -eq 1 ]] ; then echo "Will deploy" ; else echo "Won't deploy" ; fi
   # - twine upload --skip-existing --repository-url https://test.pypi.org/legacy -u "__token__" -p "$TEST_PYPI_TOKEN" dist/*
 addons:
   apt:
