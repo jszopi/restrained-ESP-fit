@@ -71,15 +71,16 @@ script:
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
   - restrained_ESP_fit  # The target `resp` binary always returns 0
   # TODO: Add some tests
-  - false
   - pip install twine
   - twine check dist/*
 after_success:
-  - echo "Successful build"
-  - ls dist
-  - if [[ $(git tag --points-at HEAD | head -c1 | wc -c) -ne 0 ]] ; then echo "Tagged commit" ; else echo "Commit not tagged" ; fi
-  - if [[ $(git tag --points-at HEAD | head -c1 | wc -c) -ne 0 && "$PYPI_DEPLOY" -eq 1 ]] ; then echo "Will deploy" ; else echo "Won't deploy" ; fi
-  # - twine upload --skip-existing --repository-url https://test.pypi.org/legacy -u "__token__" -p "$TEST_PYPI_TOKEN" dist/*
+  - >
+    if [[ $(git tag --points-at HEAD | head -c1 | wc -c) -ne 0 && "$PYPI_DEPLOY" -eq 1 ]] ; then
+      echo "Build successful, tagged commit and job marked for deployment --- deploying..."
+      twine upload --skip-existing --repository-url https://test.pypi.org/legacy -u "__token__" -p "$TEST_PYPI_TOKEN" dist/*
+    else \
+      echo "Build successful but criteria not met, not deploying."
+    fi
 addons:
   apt:
     packages: gfortran
