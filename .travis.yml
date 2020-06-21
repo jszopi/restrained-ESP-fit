@@ -9,7 +9,7 @@ matrix:
         # Linux binary wheel must be created using a manylinux docker image,
         # see build job below.
         - PYPI_DEPLOY=0
-        - PYPI_PLAT=linux_x86_64
+        - WHEEL_PLAT=linux_x86_64
         - VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/5
     - name: macOS 10.15.4 with Xcode 11.6
       os: osx
@@ -19,7 +19,7 @@ matrix:
         - PYENV_VERSION='3.7.7'
         - PYENV_VERSION_STRING='Python 3.7.7'
         - PYPI_DEPLOY=1
-        - PYPI_PLAT=macosx_10_15_x86_64
+        - WHEEL_PLAT=macosx_10_15_x86_64
         # Using an older gcc because newer ones actually use clang and I
         # wasn't able to statically link libquadmath with it.
         - GCC_OVERRIDE=/usr/local/bin/gcc-4.9
@@ -39,7 +39,7 @@ matrix:
       env:
         - DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
         - PYPI_DEPLOY=1
-        - PYPI_PLAT=manylinux2014_x86_64
+        - WHEEL_PLAT=manylinux2014_x86_64
         - VPATH_DIR=/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
       install:
         - docker pull $DOCKER_IMAGE
@@ -48,13 +48,13 @@ matrix:
           docker run \
             --rm \
             -e VPATH_DIR="$VPATH_DIR" \
-            -e PYPI_PLAT="$PYPI_PLAT" \
+            -e WHEEL_PLAT="$WHEEL_PLAT" \
             -v `pwd`:/io \
             -w /io \
             $DOCKER_IMAGE \
             /bin/bash -xc '
               PYBIN="/opt/python/cp37-cp37m/bin/" &&
-              "$PYBIN"/python setup.py sdist bdist_wheel --python-tag py3 --plat="$PYPI_PLAT" &&
+              "$PYBIN"/python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT" &&
               auditwheel show /io/dist/*.whl
               # The Makefile links any non-manylinux libraries statically.
               # However, `auditwheel show` is useful to confirm that nothing
@@ -72,7 +72,7 @@ cache:
 script:
   # Build only if artifacts not already present (as will be the case with the
   # manylinux build, which requires post-processing in container).
-  - if [[ ! -d dist ]] ; then python setup.py sdist bdist_wheel --python-tag py3 --plat="$PYPI_PLAT" ; fi
+  - if [[ ! -d dist ]] ; then python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT" ; fi
   - ldd ./restrained_ESP_fit/resp || otool -L ./restrained_ESP_fit/resp
   # Test installing from source, which should still work if gfortran is available
   - pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
