@@ -77,7 +77,7 @@ script:
   # Test installing from source, which should still work if gfortran is available
   - pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
   - restrained_ESP_fit  # In lieu of tests; the target `resp` binary always returns 0
-  - pip uninstall restrained-ESP-fit
+  - pip uninstall --yes restrained-ESP-fit
   # Test installing from the binary wheel
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
   - restrained_ESP_fit  # In lieu of tests; the target `resp` binary always returns 0
