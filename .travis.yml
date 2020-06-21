@@ -54,11 +54,17 @@ matrix:
             $DOCKER_IMAGE \
             /bin/bash -xc '
               PYBIN="/opt/python/cp37-cp37m/bin/" &&
-              "$PYBIN"/python setup.py sdist bdist_wheel --python-tag py3 --plat="$PYPI_PLAT"
-              # ORIGINAL_WHEEL="$(ls /io/dist/*.whl)" &&
-              # auditwheel show "$ORIGINAL_WHEEL" &&
-              # auditwheel repair "$ORIGINAL_WHEEL" --plat manylinux2014_x86_64 -w /io/dist/ &&
-              # rm "$ORIGINAL_WHEEL"
+              "$PYBIN"/python setup.py sdist bdist_wheel --python-tag py3 --plat="$PYPI_PLAT" &&
+              auditwheel show /io/dist/*.whl
+              # The Makefile links any non-manylinux libraries statically.
+              # However, `auditwheel show` is useful to confirm that nothing
+              # slipped through. It would be even better to assert that nothing
+              # needs repairing, which may be possible through an exit code in
+              # the future: https://github.com/pypa/auditwheel/issues/180
+              #
+              # Note that `auditwheel repair` would not work anyway, as it is
+              # only meant for binary extensions which are later imported
+              # through the interpreter.
             '
 cache:
   - directories:
