@@ -17,7 +17,6 @@ class build_(distutils.command.build.build):
 
 config = {
     'name': 'restrained_ESP_fit',
-    'version': '2.4.11',
     'description': 'Fitting partial charges to molecular Electrostatic Potential field',
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
