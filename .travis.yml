@@ -39,16 +39,15 @@ matrix:
       env:
         - DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
         - PYPI_DEPLOY=1
-        - WHEEL_PLAT=manylinux2014_x86_64
-        - VPATH_DIR=/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+        - VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/7
       install:
         - docker pull $DOCKER_IMAGE
       before_script:
         - >
           docker run \
             --rm \
-            -e VPATH_DIR="$VPATH_DIR" \
-            -e WHEEL_PLAT="$WHEEL_PLAT" \
+            -e VPATH_DIR=/opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9 \
+            -e WHEEL_PLAT=manylinux2014_x86_64 \
             -v `pwd`:/io \
             -w /io \
             $DOCKER_IMAGE \
