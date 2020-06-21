@@ -68,9 +68,13 @@ script:
   # manylinux build, which requires post-processing in container).
   - if [[ ! -d dist ]] ; then python setup.py sdist bdist_wheel --python-tag py3 --plat="$PYPI_PLAT" ; fi
   - ldd resp || otool -L resp
+  # Test installing from source, which should still work if gfortran is available
+  - pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
+  - restrained_ESP_fit  # In lieu of tests; the target `resp` binary always returns 0
+  - pip uninstall restrained-ESP-fit
+  # Test installing from the binary wheel
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
-  - restrained_ESP_fit  # The target `resp` binary always returns 0
-  # TODO: Add some tests
+  - restrained_ESP_fit  # In lieu of tests; the target `resp` binary always returns 0
   - pip install twine
   - twine check dist/*
 after_success:
