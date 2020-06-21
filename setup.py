@@ -1,10 +1,19 @@
-from setuptools import setup, Distribution
+from setuptools import setup
+import distutils.command.build
 import subprocess
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-subprocess.run(["make"]).check_returncode()
+
+class build_(distutils.command.build.build):
+
+    def run(self):
+        print("Running build")
+        subprocess.run(["make"]).check_returncode()
+        subprocess.run(["mv", "resp", "restrained_ESP_fit"]).check_returncode()
+        distutils.command.build.build.run(self)
+
 
 config = {
     'name': 'restrained_ESP_fit',
@@ -17,10 +26,13 @@ config = {
     'url': 'https://github.com/jszopi/restrained_ESP_fit',
     'license': 'GPLv3',
     'packages': ["restrained_ESP_fit"],
-    'data_files': [(".", ["resp"])],
+    'package_data': {"restrained_ESP_fit": ["resp"]},
+    # Hacky? Causes the `resp` binary to be included in bdist_wheel but not in sdist
+    'include_package_data': True,
     'entry_points': {
         'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit.resp_wrapper:main"],
     },
+    'cmdclass': {'build': build_},
 }
 
 setup(**config)
