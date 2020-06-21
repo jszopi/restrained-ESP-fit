@@ -67,7 +67,7 @@ script:
   # Build only if artifacts not already present (as will be the case with the
   # manylinux build, which requires post-processing in container).
   - if [[ ! -d dist ]] ; then python setup.py sdist bdist_wheel --python-tag py3 --plat="$PYPI_PLAT" ; fi
-  - ldd resp || otool -L resp
+  - ldd ./restrained_ESP_fit/resp || otool -L ./restrained_ESP_fit/resp
   - pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
   - restrained_ESP_fit  # The target `resp` binary always returns 0
   # TODO: Add some tests
