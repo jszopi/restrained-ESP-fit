@@ -34,6 +34,19 @@ config = {
     'cmdclass': {'build': build_},
     'use_scm_version': True,
     'setup_requires': ["setuptools_scm"],
+    'python_requires': ">=3",
+    'classifiers': [
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Topic :: Scientific/Engineering :: Chemistry",
+    ],
+    'keywords': ["restrained molecular electrostatic potential ESP fitting RESP charges"]
 }
 
 setup(**config)
