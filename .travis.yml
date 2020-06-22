@@ -70,7 +70,7 @@ cache:
     - $HOME/.pyenv_cache
 script:
   # Build only if artifacts not already present (as will be the case with the
-  # manylinux build, which requires post-processing in container).
+  # manylinux build, which is built in a container).
   - if [[ ! -d dist ]] ; then python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT" ; fi
   - ldd ./restrained_ESP_fit/resp || otool -L ./restrained_ESP_fit/resp
   # Test installing from source, which should still work if gfortran is available
