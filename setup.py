@@ -46,7 +46,7 @@ config = {
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering :: Chemistry",
     ],
-    'keywords': ["restrained molecular electrostatic potential ESP fitting RESP charges"]
+    'keywords': ["restrained molecular electrostatic potential ESP fitting RESP atomic partial charges"]
 }
 
 setup(**config)
