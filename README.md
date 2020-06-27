@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jszopi/restrained_ESP_fit.svg?branch=master)](https://travis-ci.org/jszopi/restrained_ESP_fit)
+[![Build Status](https://travis-ci.com/jszopi/restrained-ESP-fit.svg?branch=master)](https://travis-ci.com/jszopi/restrained-ESP-fit)
 
 # restrained_ESP_fit
 
