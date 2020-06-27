@@ -2,7 +2,7 @@ matrix:
   include:
     - name: Quick Linux build
       os: linux
-      dist: xenial  # Ubuntu 16.04, reasonably old and LTS
+      dist: bionic  # Ubuntu 18.04 LTS
       language: python
       python: "3.7"
       env:
