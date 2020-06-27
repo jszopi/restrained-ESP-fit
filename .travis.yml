@@ -10,7 +10,7 @@ matrix:
         # see build job below.
         - PYPI_DEPLOY=0
         - WHEEL_PLAT=linux_x86_64
-        - VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/5
+        - VPATH_DIR=/usr/lib/gcc/x86_64-linux-gnu/7
     - name: macOS 10.15.4 with Xcode 11.6
       os: osx
       osx_image: xcode11.6
