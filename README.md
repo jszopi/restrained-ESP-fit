@@ -16,6 +16,22 @@ I am hoping to rewrite this program in Python in order to encourage users to exp
 The code will thus soon be available in PyPI, possibly under a less generic name.
 Please open a PR if you'd like it to be available in your system's package manager.
 
+# Usage
+
+## Install
+
+### Install from source
+
+<!-- TODO: This section only pertains to environment variables, add more complete instructions. -->
+The original `resp` program can be compiled with different Fortran compilers and flags.
+These options are currently not exposed from the Python installer; please open an issue if you would benefit from being able to control these options.
+
+A few options are exposed when the `resp` program is to be linked statically, primarily for the purpose of CD of binary wheels.
+If the `RESTRAINED_ESP_FIT_RESP_STATIC` variable is set to "1" during installation, the `resp` binary will be compiled while statically linking the libgfortran and libquadmath libraries.
+You are required to provide the path to where these static libraries can be found by setting the `RESTRAINED_ESP_FIT_RESP_VPATH_DIR` variable.
+`gcc` will be used as the compiler and if the one in you `$PATH` isn't suitable, you can override it by setting `RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE`.
+This will be necessary on macOS, where `gcc` after major version 4 actually invoke clang, which isn't compatible with the flags used in the build.
+
 --- 
 
 ¹ C. I. Bayly, P. Cieplak, W. D. Cornell and P. A. Kollman, *J. Phys. Chem.*, 1993, **97**, 10269–10280
