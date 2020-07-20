@@ -1,6 +1,9 @@
 from setuptools import setup
 import distutils.command.build
+import os
+import shutil
 import subprocess
+import tempfile
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -10,8 +13,17 @@ class build_(distutils.command.build.build):
 
     def run(self):
         print("Running build")
-        subprocess.run(["make"]).check_returncode()
-        subprocess.run(["mv", "resp", "restrained_ESP_fit"]).check_returncode()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copytree("resp", tmpdir, dirs_exist_ok=True)
+            shutil.rmtree(f"{tmpdir}/build", ignore_errors=True)
+            if os.environ.get("RESTRAINED_ESP_FIT_RESP_STATIC") == "1":
+                if os.environ.get("RESTRAINED_ESP_FIT_RESP_VPATH_DIR") is None:
+                    raise RuntimeError("Requested static linking of `resp` but the environment variable RESTRAINED_ESP_FIT_RESP_VPATH_DIR is not set.")
+                shutil.copy("Makefile-resp-static", f"{tmpdir}/Makefile")
+            subprocess.run(["make"], cwd=tmpdir).check_returncode()
+            shutil.copytree(tmpdir, "resp/build", dirs_exist_ok=True)
+
         distutils.command.build.build.run(self)
 
 
@@ -25,7 +37,7 @@ config = {
     'url': 'https://github.com/jszopi/restrained_ESP_fit',
     'license': 'GPLv3',
     'packages': ["restrained_ESP_fit"],
-    'package_data': {"restrained_ESP_fit": ["resp"]},
+    'package_data': {"restrained_ESP_fit": ["resp/build/resp"]},
     # Hacky? Causes the `resp` binary to be included in bdist_wheel but not in sdist
     'include_package_data': True,
     'entry_points': {
