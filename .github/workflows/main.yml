@@ -31,6 +31,7 @@ jobs:
             python-version: 3.7
             os: ubuntu-18.04
             container: quay.io/pypa/manylinux2014_x86_64
+            pybin: /opt/python/cp37-cp37m/bin/
             WHEEL_PLAT: manylinux2014_x86_64
             STATIC: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
@@ -56,6 +57,14 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Configure manylinux
+      if: ${{ startsWith(matrix.os, 'manylinux') }}
+      run: |
+        which python
+        which pip
+        which auditwheel
+        ls ${{matrix.pybin}}
 
     - name: Install dependencies
       run: |
