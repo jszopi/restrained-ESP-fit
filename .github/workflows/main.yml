@@ -14,30 +14,31 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     runs-on: ${{ matrix.os }}
+    container: quay.io/pypa/manylinux2014_x86_64
 
     strategy:
       fail-fast: false
       matrix:
         # build: [ quick-linux, manylinux, macos ]
-        build: [ macos ]
+        build: [ manylinux ]
         python-version: [3.9]
         include:
           # - build: quick-linux
           #   os: ubuntu-18.04
           #   WHEEL_PLAT: linux_x86_64
           #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-          # - build: manylinux
-          #   os: ubuntu-18.04
-          #   WHEEL_PLAT: linux_x86_64
-          #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-          - build: macos
-            os: macos-10.15
-            WHEEL_PLAT: macosx_10_15_x86_64
-            STATIC: 1
-            # Using an older gcc because newer ones actually use clang and I
-            # wasn't able to statically link libquadmath with it.
-            GCC_OVERRIDE: /usr/local/bin/gcc-4.9
-            VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
+          - build: manylinux
+            os: ubuntu-18.04
+            WHEEL_PLAT: linux_x86_64
+            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+          # - build: macos
+          #   os: macos-10.15
+          #   WHEEL_PLAT: macosx_10_15_x86_64
+          #   STATIC: 1
+          #   # Using an older gcc because newer ones actually use clang and I
+          #   # wasn't able to statically link libquadmath with it.
+          #   GCC_OVERRIDE: /usr/local/bin/gcc-4.9
+          #   VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
 
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
