@@ -90,6 +90,8 @@ jobs:
         ls /usr/local/bin/gcc-11
         echo "====/usr/local/bin/gcc-11 --version==="
         /usr/local/bin/gcc-11 --version
+        echo "====check cellar==="
+        ls -R /usr/local/Cellar/gcc@11*
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
