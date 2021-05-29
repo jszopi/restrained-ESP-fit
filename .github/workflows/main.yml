@@ -19,6 +19,7 @@ jobs:
         python-version: [3.9]
     env:
       WHEEL_PLAT: linux_x86_64
+      RESTRAINED_ESP_FIT_RESP_VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
     steps:
     - uses: actions/checkout@v2
@@ -35,3 +36,24 @@ jobs:
 
     - name: Build sdist and bdist_wheel
       run: python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT"
+
+    - name: Verify that libraries are linked as expected
+      run: ldd ./restrained_ESP_fit/build/resp || otool -L ./restrained_ESP_fit/build/resp
+
+    - name: Test installing from source, which should still work if gfortran is available
+      run: pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
+
+    - name: Run the `resp` binary in lieu of tests (returns 0)
+      run: restrained_ESP_fit
+
+    - name: Uninstall restrained-ESP-fit...
+      run: pip uninstall --yes restrained-ESP-fit
+
+    - name: ...in order to test installing from the binary wheel
+      run: pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
+
+    - name: Run the `resp` binary in lieu of tests (returns 0)
+      run: restrained_ESP_fit
+
+    - name: Check if package passes validation for publishing to PyPI
+      run: twine check dist/*
