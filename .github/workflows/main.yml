@@ -64,11 +64,14 @@ jobs:
         which python
         which pip
         which auditwheel
-        ls ${{matrix.pybin}}
-        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+        # echo "ls ${{matrix.pybin}}"
+        # ls ${{matrix.pybin}}
+        echo "ls /usr/local/lib"
+        ls /usr/local/lib
 
     - name: Install dependencies
       run: |
+        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
 
