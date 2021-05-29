@@ -95,12 +95,12 @@ jobs:
       run: pip uninstall --yes restrained-ESP-fit
 
     - name: Build wheels (manylinux)
-      if: ${{ startsWith(matrix.build, 'manylinux') }}
+      if: ${{ startsWith(matrix.build, 'manylinux') && (matrix.wheel-platform == 'manylinux2014_x86_64') }}
       run: echo
-      # uses: ${{ format('RalfG/python-wheels-manylinux-build@v0.3.3-{0}', matrix.build) }}
-      # with:
-      #   python-versions: 'cp37-cp37m'
-      #   pip-wheel-args: '-w ./dist --no-deps --use-feature=in-tree-build'
+      uses: RalfG/python-wheels-manylinux-build@v0.3.3-{0}-manylinux2014_x86_64
+      with:
+        python-versions: 'cp37-cp37m'
+        pip-wheel-args: '-w ./dist --no-deps --use-feature=in-tree-build'
 
     - name: Build wheels (host)
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
