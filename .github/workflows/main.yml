@@ -68,16 +68,28 @@ jobs:
         brew update
         brew install gcc@4.9
 
-    - name: Python wheels manylinux build
+    - name: Build sdist
+      run: python setup.py sdist
+
+    - name: Test installing from sdist
+      run: pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
+
+    - name: Run the `resp` binary in lieu of tests (returns 0)
+      run: restrained_ESP_fit
+
+    - name: Uninstall restrained-ESP-fit
+      run: pip uninstall --yes restrained-ESP-fit
+
+    - name: Build wheels: manylinux build
       if: ${{ startsWith(matrix.build, 'manylinux') }}
       uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2014_x86_64
       with:
         python-versions: 'cp37-cp37m'
         pip-wheel-args: '-w ./dist --no-deps --use-feature=in-tree-build'
 
-    - name: Build sdist and bdist_wheel
+    - name: Build wheels
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
-      run: python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT"
+      run: python setup.py bdist_wheel
 
     - name: Validate the created wheel(s)
       run: |
@@ -93,26 +105,17 @@ jobs:
         # through the interpreter.
         auditwheel show dist/*.whl
 
-    - name: Test installing from source, which should still work if gfortran is available
-      run: pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
+    - name: Test installing from wheel
+      run: pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
 
     - name: Run the `resp` binary in lieu of tests (returns 0)
       run: restrained_ESP_fit
-
-    - name: Uninstall restrained-ESP-fit...
-      run: pip uninstall --yes restrained-ESP-fit
-
-    - name: ...in order to test installing from the binary wheel
-      run: pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
 
     - name: Verify that libraries are linked into `resp` as expected
       run: |
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         ldd "$RESP_BINARY" || otool -L "$RESP_BINARY"
-
-    - name: Run the `resp` binary in lieu of tests (returns 0)
-      run: restrained_ESP_fit
 
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
