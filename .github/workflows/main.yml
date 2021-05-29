@@ -21,7 +21,6 @@ jobs:
     runs-on: {{ matrix.os }}
     env:
       WHEEL_PLAT: linux_x86_64
-      RESTRAINED_ESP_FIT_RESP_VPATH_DIR: {{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
