@@ -13,16 +13,25 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    runs-on: ubuntu-18.04
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.9]
+        os: [ubuntu-18.04, macos-10.15]
+    runs-on: {{ matrix.os }}
     env:
       WHEEL_PLAT: linux_x86_64
-      RESTRAINED_ESP_FIT_RESP_VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-
+      RESTRAINED_ESP_FIT_RESP_VPATH_DIR: {{ fromJSON('
+        {
+          ubuntu-18.04: "/usr/lib/gcc/x86_64-linux-gnu/7",
+          macos-10.15: "/usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9"
+        }
+        ')[matrix.os] }}
     steps:
     - uses: actions/checkout@v2
+
+    - name: Test environment variables dependent on the OS
+      run: echo "$RESTRAINED_ESP_FIT_RESP_VPATH_DIR"
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
