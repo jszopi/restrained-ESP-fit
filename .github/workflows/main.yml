@@ -59,7 +59,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Configure manylinux
-      if: ${{ startsWith(matrix.os, 'manylinux') }}
+      if: ${{ startsWith(matrix.build, 'manylinux') }}
       run: |
         which python
         which pip
