@@ -14,7 +14,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     runs-on: ${{ matrix.os }}
-    container: quay.io/pypa/manylinux2014_x86_64
+    container: ${{ matrix.container }}
 
     strategy:
       fail-fast: false
@@ -23,12 +23,13 @@ jobs:
         build: [ manylinux ]
         python-version: [3.9]
         include:
-          # - build: quick-linux
-          #   os: ubuntu-18.04
-          #   WHEEL_PLAT: linux_x86_64
-          #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+          - build: quick-linux
+            os: ubuntu-18.04
+            WHEEL_PLAT: linux_x86_64
+            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
           - build: manylinux
             os: ubuntu-18.04
+            container: quay.io/pypa/manylinux2014_x86_64
             WHEEL_PLAT: linux_x86_64
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
           # - build: macos
