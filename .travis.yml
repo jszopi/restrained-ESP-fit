@@ -73,7 +73,7 @@ script:
   # Build only if artifacts not already present (as will be the case with the
   # manylinux build, which is built in a container).
   - if [[ ! -d dist ]] ; then python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT" ; fi
-  - ldd ./restrained_ESP_fit/resp || otool -L ./restrained_ESP_fit/resp
+  - ldd ./restrained_ESP_fit/build/resp || otool -L ./restrained_ESP_fit/build/resp
   # Test installing from source, which should still work if gfortran is available
   - pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
   - restrained_ESP_fit  # In lieu of tests; the target `resp` binary always returns 0
