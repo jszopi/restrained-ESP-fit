@@ -15,14 +15,16 @@ class build_(distutils.command.build.build):
         print("Running build")
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copytree("resp", tmpdir, dirs_exist_ok=True)
+            shutil.copytree("resp", tmpdir)
             shutil.rmtree(f"{tmpdir}/build", ignore_errors=True)
             if os.environ.get("RESTRAINED_ESP_FIT_RESP_STATIC") == "1":
                 if os.environ.get("RESTRAINED_ESP_FIT_RESP_VPATH_DIR") is None:
                     raise RuntimeError("Requested static linking of `resp` but the environment variable RESTRAINED_ESP_FIT_RESP_VPATH_DIR is not set.")
                 shutil.copy("Makefile-resp-static", f"{tmpdir}/Makefile")
             subprocess.run(["make"], cwd=tmpdir).check_returncode()
-            shutil.copytree(tmpdir, "restrained_ESP_fit/build", dirs_exist_ok=True)
+            # This will throw if the directory already exists. I'm not sure
+            # if users who re-install will be affected by this.
+            shutil.copytree(tmpdir, "restrained_ESP_fit/build")
 
         distutils.command.build.build.run(self)
 
