@@ -21,7 +21,7 @@ jobs:
       matrix:
         # build: [ quick-linux, manylinux, macos ]
         build: [ quick-linux, manylinux ]
-        python-version: [3.9]
+        python-version: [3.7, 3.9]
         include:
           - build: quick-linux
             os: ubuntu-18.04
