@@ -30,7 +30,7 @@ jobs:
           - build: macos
             os: macos-10.15
             WHEEL_PLAT: macosx_10_15_x86_64
-            static_link: 1
+            static-link: 1
             # Using an older gcc because newer ones actually use clang and I
             # was getting missing symbols.
             COMPILER_OVERRIDE: /usr/local/bin/gcc-4.9
@@ -40,7 +40,7 @@ jobs:
             python-version: 3.7
             os: ubuntu-18.04
             WHEEL_PLAT: manylinux2014_x86_64
-            static_link: 1
+            static-link: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
 
         exclude:
