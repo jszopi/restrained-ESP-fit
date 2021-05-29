@@ -30,6 +30,11 @@ jobs:
             RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE: /usr/local/bin/gcc-4.9
             RESTRAINED_ESP_FIT_RESP_VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
 
+    env:
+      WHEEL_PLAT: ${{ matrix.WHEEL_PLAT}}
+      RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE: ${{ matrix.RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE}}
+      RESTRAINED_ESP_FIT_RESP_VPATH_DIR: ${{ matrix.RESTRAINED_ESP_FIT_RESP_VPATH_DIR}}
+
     steps:
     - uses: actions/checkout@v2
 
