@@ -104,7 +104,7 @@ jobs:
 
     - name: Build wheels (host)
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
-      run: ${{format('python setup.py bdist_wheel --python-tag py3 --plat={0}', matrix.build) }}
+      run: ${{format('python setup.py bdist_wheel --python-tag py3 --plat={0}', matrix.wheel-platform) }}
 
     - name: Validate the created wheel(s)
       if: ${{ startsWith(matrix.os, 'ubuntu') }}  # auditwheel is linux-only
