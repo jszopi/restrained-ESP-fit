@@ -20,11 +20,11 @@ jobs:
       matrix:
         python-version: [3.9]
         matrix:
-          - os: ubuntu-18.04
+          - os: ubuntu-latest
             WHEEL_PLAT: linux_x86_64
             RESTRAINED_ESP_FIT_RESP_VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
-          - os: macos-10.15
+          - os: macos-latest
             WHEEL_PLAT: linux_x86_64
             # Using an older gcc because newer ones actually use clang and I
             # wasn't able to statically link libquadmath with it.
