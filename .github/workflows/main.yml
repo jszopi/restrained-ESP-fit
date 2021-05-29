@@ -9,9 +9,7 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -22,6 +20,7 @@ jobs:
         # build: [ quick-linux, manylinux, macos ]
         build: [ quick-linux ]
         python-version: [3.9]
+        # TODO: Can we parametrize on STATIC too?
         include:
           - build: quick-linux
             os: ubuntu-18.04
@@ -54,21 +53,12 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
-      if: ${{ !startsWith(matrix.build, 'manylinux') }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Configure manylinux
-      if: ${{ startsWith(matrix.build, 'manylinux') }}
-      run: |
-        which python
-        which pip
-        which auditwheel
-
     - name: Install dependencies
       run: |
-        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
 
@@ -78,11 +68,32 @@ jobs:
         brew update
         brew install gcc@4.9
 
+    - name: Python wheels manylinux build
+      if: ${{ startsWith(matrix.build, 'manylinux') }}
+      uses: RalfG/python-wheels-manylinux-build@v0.3.3-quay.io/pypa/manylinux2014_x86_64
+      with:
+        python-versions: 'cp37-cp37m'
+
     - name: Build sdist and bdist_wheel
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT"
 
-    - name: Verify that libraries are linked as expected
+    - name: Verify that libraries are linked into `resp` as expected
       run: ldd ./restrained_ESP_fit/build/resp || otool -L ./restrained_ESP_fit/build/resp
+
+    - name: Validate the created wheel(s)
+      run: |
+        ls dist
+        # The Makefile links any non-manylinux libraries statically.
+        # However, `auditwheel show` is useful to confirm that nothing
+        # slipped through. It would be even better to assert that nothing
+        # needs repairing, which may be possible through an exit code in
+        # the future: https://github.com/pypa/auditwheel/issues/180
+        #
+        # Note that `auditwheel repair` would not work anyway, as it is
+        # only meant for binary extensions which are later imported
+        # through the interpreter.
+        auditwheel show dist/*.whl
 
     - name: Test installing from source, which should still work if gfortran is available
       run: pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
