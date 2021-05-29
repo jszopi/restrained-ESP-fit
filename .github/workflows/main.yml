@@ -91,9 +91,7 @@ jobs:
         echo "====/usr/local/bin/gcc-11 --version==="
         /usr/local/bin/gcc-11 --version
         echo "====check cellar==="
-        ls /usr/local/Cellar/
-        echo "====check cellar==="
-        locate libquadmath.0.dylib
+        ls -R /usr/local/Cellar/gcc/
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
