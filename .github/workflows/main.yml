@@ -51,7 +51,7 @@ jobs:
 
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
-      RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static_link }}
+      RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static-link }}
       RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE: ${{ matrix.COMPILER_OVERRIDE }}
       RESTRAINED_ESP_FIT_RESP_VPATH_DIR: ${{ matrix.VPATH_DIR }}
 
