@@ -19,7 +19,7 @@ jobs:
       matrix:
         build: [ quick-linux, macos ]
         python-version: [3.9]
-        # TODO: Can we parametrize on STATIC too?
+        static-link: [0, 1]
         include:
 
           - build: quick-linux
@@ -30,7 +30,7 @@ jobs:
           - build: macos
             os: macos-10.15
             WHEEL_PLAT: macosx_10_15_x86_64
-            STATIC: 1
+            static_link: 1
             # Using an older gcc because newer ones actually use clang and I
             # wasn't able to statically link libquadmath with it.
             GCC_OVERRIDE: /usr/local/bin/gcc-4.9
@@ -40,12 +40,16 @@ jobs:
             python-version: 3.7
             os: ubuntu-18.04
             WHEEL_PLAT: manylinux2014_x86_64
-            STATIC: 1
+            static_link: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+
+        exclude:
+          - build: macos
+            static-link: 0  # TODO: Currently fails due to not finding gfortran
 
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
-      RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.STATIC }}
+      RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static_link }}
       RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE: ${{ matrix.GCC_OVERRIDE }}
       RESTRAINED_ESP_FIT_RESP_VPATH_DIR: ${{ matrix.VPATH_DIR }}
 
