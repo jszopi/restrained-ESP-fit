@@ -33,14 +33,14 @@ jobs:
             static_link: 1
             # Using an older gcc because newer ones actually use clang and I
             # wasn't able to statically link libquadmath with it.
-            GCC_OVERRIDE: /usr/local/bin/gcc-4.9
+            COMPILER_OVERRIDE: /usr/local/bin/gcc-4.9
             VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
 
           - build: macos
             os: macos-10.15
             WHEEL_PLAT: macosx_10_15_x86_64
             static_link: 0
-            GCC_OVERRIDE: gcc
+            COMPILER_OVERRIDE: gcc
 
           - build: manylinux
             python-version: 3.7
@@ -52,7 +52,7 @@ jobs:
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
       RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static_link }}
-      RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE: ${{ matrix.GCC_OVERRIDE }}
+      RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE: ${{ matrix.COMPILER_OVERRIDE }}
       RESTRAINED_ESP_FIT_RESP_VPATH_DIR: ${{ matrix.VPATH_DIR }}
 
     steps:
