@@ -65,6 +65,7 @@ jobs:
         which pip
         which auditwheel
         ls ${{matrix.pybin}}
+        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 
     - name: Install dependencies
       run: |
