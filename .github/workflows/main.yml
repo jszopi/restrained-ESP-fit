@@ -25,12 +25,10 @@ jobs:
           #   os: ubuntu-18.04
           #   WHEEL_PLAT: linux_x86_64
           #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-
           # - build: manylinux
           #   os: ubuntu-18.04
           #   WHEEL_PLAT: linux_x86_64
           #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-
           - build: macos
             os: macos-10.15
             WHEEL_PLAT: macosx_10_15_x86_64
