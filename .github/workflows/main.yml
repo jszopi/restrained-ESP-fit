@@ -29,7 +29,7 @@ jobs:
           - build: manylinux
             python-version: 3.9
             os: ubuntu-18.04
-            container: quay.io/pypa/manylinux2014_x86_64
+            # container: quay.io/pypa/manylinux2014_x86_64
             WHEEL_PLAT: manylinux2014_x86_64
             STATIC: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
