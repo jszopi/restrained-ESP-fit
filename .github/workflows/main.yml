@@ -27,7 +27,7 @@ jobs:
             WHEEL_PLAT: linux_x86_64
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
           - build: manylinux
-            python-version: 3.7
+            python-version: 3.8
             os: ubuntu-18.04
             WHEEL_PLAT: manylinux2014_x86_64
             STATIC: 1
