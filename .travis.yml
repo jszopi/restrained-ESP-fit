@@ -31,6 +31,7 @@ matrix:
         # Python 2.7 was being picked up during the deploy step).
         - wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
         - source setup-pyenv.sh
+        # TODO: If I could override PATH here or alias gcc, I could get rid of the gcc override option.
     - name: manylinux2014
       dist: bionic
       language: python
