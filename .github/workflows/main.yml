@@ -17,29 +17,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # build: [ quick-linux, manylinux, macos ]
-        build: [ quick-linux ]
+        build: [ quick-linux, macos ]
         python-version: [3.9]
         # TODO: Can we parametrize on STATIC too?
         include:
+
           - build: quick-linux
             os: ubuntu-18.04
             WHEEL_PLAT: linux_x86_64
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+
+          - build: macos
+            os: macos-10.15
+            WHEEL_PLAT: macosx_10_15_x86_64
+            STATIC: 1
+            # Using an older gcc because newer ones actually use clang and I
+            # wasn't able to statically link libquadmath with it.
+            GCC_OVERRIDE: /usr/local/bin/gcc-4.9
+            VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
+
           - build: manylinux
             python-version: 3.7
             os: ubuntu-18.04
             WHEEL_PLAT: manylinux2014_x86_64
             STATIC: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
-          # - build: macos
-          #   os: macos-10.15
-          #   WHEEL_PLAT: macosx_10_15_x86_64
-          #   STATIC: 1
-          #   # Using an older gcc because newer ones actually use clang and I
-          #   # wasn't able to statically link libquadmath with it.
-          #   GCC_OVERRIDE: /usr/local/bin/gcc-4.9
-          #   VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
 
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
@@ -50,6 +52,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
+        # The default shallow clone isn't enough for setuptools, which inspects
+        # old commit tags to determine the package version
+        # https://github.com/pypa/setuptools_scm/issues/414 (closed)
         fetch-depth: 0
 
     - name: Set up Python ${{ matrix.python-version }}
@@ -91,22 +96,21 @@ jobs:
         python-versions: 'cp37-cp37m'
         pip-wheel-args: '-w ./dist --no-deps --use-feature=in-tree-build'
 
-    - name: Build wheels (host OS)
+    - name: Build wheels (host)
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: python setup.py bdist_wheel
 
     - name: Validate the created wheel(s)
       run: |
-        ls dist
-        # The Makefile links any non-manylinux libraries statically.
-        # However, `auditwheel show` is useful to confirm that nothing
-        # slipped through. It would be even better to assert that nothing
-        # needs repairing, which may be possible through an exit code in
-        # the future: https://github.com/pypa/auditwheel/issues/180
+        # The Makefile links any non-manylinux libraries statically. However,
+        # `auditwheel show` is useful to confirm that nothing slipped through.
+        # It would be even better to assert that nothing needs repairing, which
+        # may be possible through an exit code in the future:
+        # https://github.com/pypa/auditwheel/issues/180
         #
-        # Note that `auditwheel repair` would not work anyway, as it is
-        # only meant for binary extensions which are later imported
-        # through the interpreter.
+        # Note that `auditwheel repair` would not work anyway, as it is only
+        # meant for binary extensions which are later imported through the
+        # interpreter.
         auditwheel show dist/*.whl
 
     - name: Test installing from wheel
