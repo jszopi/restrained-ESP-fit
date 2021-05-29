@@ -21,15 +21,15 @@ jobs:
         build: [ quick-linux, manylinux, macos ]
         python-version: [3.9]
         include:
-          - build: quick-linux
-            os: ubuntu-18.04
-            WHEEL_PLAT: linux_x86_64
-            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+          # - build: quick-linux
+          #   os: ubuntu-18.04
+          #   WHEEL_PLAT: linux_x86_64
+          #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
-          - build: manylinux
-            os: ubuntu-18.04
-            WHEEL_PLAT: linux_x86_64
-            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+          # - build: manylinux
+          #   os: ubuntu-18.04
+          #   WHEEL_PLAT: linux_x86_64
+          #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
           - build: macos
             os: macos-10.15
@@ -60,7 +60,7 @@ jobs:
         pip install setuptools wheel twine
 
     - name: Install homebrew and an older gcc
-      if: ${{ startsWith('macos', matrix.os) }}
+      if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
         brew update
         brew install gcc@4.9
