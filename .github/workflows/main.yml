@@ -76,8 +76,8 @@ jobs:
     - name: Install homebrew and an older gcc
       if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
-        brew update
-        brew install gcc@4.9
+        # brew update
+        # brew install gcc@4.9
         echo "====ls /usr/local/bin/gcc*===="
         ls /usr/local/bin/gcc*
         echo "====which gcc===="
@@ -91,7 +91,9 @@ jobs:
         echo "====/usr/local/bin/gcc-11 --version==="
         /usr/local/bin/gcc-11 --version
         echo "====check cellar==="
-        ls -R /usr/local/Cellar/gcc@11*
+        ls /usr/local/Cellar/
+        echo "====check cellar==="
+        locate libquadmath.0.dylib
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
