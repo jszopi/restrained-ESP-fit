@@ -78,9 +78,16 @@ jobs:
       run: |
         brew update
         brew install gcc@4.9
+        echo "====ls /usr/local/bin/gcc*===="
         ls /usr/local/bin/gcc*
-        echo "===="
+        echo "====which gcc===="
         which gcc
+        echo "====ls /usr/bin/gcc===="
+        ls /usr/bin/gcc
+        echo "====/usr/bin/gcc --version==="
+        /usr/bin/gcc --version
+        echo "====ls /usr/local/bin/gcc-11==="
+        ls /usr/local/bin/gcc-11
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
