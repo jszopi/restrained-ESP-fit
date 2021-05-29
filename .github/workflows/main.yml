@@ -69,15 +69,19 @@ jobs:
         brew install gcc@4.9
 
     - name: Build sdist
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: python setup.py sdist
 
     - name: Test installing from sdist
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
 
     - name: Run the `resp` binary in lieu of tests (returns 0)
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: restrained_ESP_fit
 
     - name: Uninstall restrained-ESP-fit
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: pip uninstall --yes restrained-ESP-fit
 
     - name: Build wheels (manylinux)
