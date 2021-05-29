@@ -36,16 +36,18 @@ jobs:
             GCC_OVERRIDE: /usr/local/bin/gcc-4.9
             VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
 
+          - build: macos
+            os: macos-10.15
+            WHEEL_PLAT: macosx_10_15_x86_64
+            static_link: 0
+            GCC_OVERRIDE: gcc
+
           - build: manylinux
             python-version: 3.7
             os: ubuntu-18.04
             WHEEL_PLAT: manylinux2014_x86_64
             static_link: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
-
-        exclude:
-          - build: macos
-            static-link: 0  # TODO: Currently fails due to not finding gfortran
 
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
