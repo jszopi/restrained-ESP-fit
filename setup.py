@@ -1,5 +1,6 @@
 from setuptools import setup
 import distutils.command.build
+from distutils.dir_util import copy_tree
 import os
 import shutil
 import subprocess
@@ -15,7 +16,7 @@ class build_(distutils.command.build.build):
         print("Running build")
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copytree("resp", tmpdir)
+            copy_tree("resp", tmpdir)
             shutil.rmtree(f"{tmpdir}/build", ignore_errors=True)
             if os.environ.get("RESTRAINED_ESP_FIT_RESP_STATIC") == "1":
                 if os.environ.get("RESTRAINED_ESP_FIT_RESP_VPATH_DIR") is None:
@@ -24,7 +25,7 @@ class build_(distutils.command.build.build):
             subprocess.run(["make"], cwd=tmpdir).check_returncode()
             # This will throw if the directory already exists. I'm not sure
             # if users who re-install will be affected by this.
-            shutil.copytree(tmpdir, "restrained_ESP_fit/build")
+            copy_tree(tmpdir, "restrained_ESP_fit/build")
 
         distutils.command.build.build.run(self)
 
