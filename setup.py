@@ -22,7 +22,7 @@ class build_(distutils.command.build.build):
                     raise RuntimeError("Requested static linking of `resp` but the environment variable RESTRAINED_ESP_FIT_RESP_VPATH_DIR is not set.")
                 shutil.copy("Makefile-resp-static", f"{tmpdir}/Makefile")
             subprocess.run(["make"], cwd=tmpdir).check_returncode()
-            shutil.copytree(tmpdir, "resp/build", dirs_exist_ok=True)
+            shutil.copytree(tmpdir, "restrained_ESP_fit/build", dirs_exist_ok=True)
 
         distutils.command.build.build.run(self)
 
@@ -37,7 +37,7 @@ config = {
     'url': 'https://github.com/jszopi/restrained_ESP_fit',
     'license': 'GPLv3',
     'packages': ["restrained_ESP_fit"],
-    'package_data': {"restrained_ESP_fit": ["resp/build/resp"]},
+    'package_data': {"restrained_ESP_fit": ["build/resp"]},
     # Hacky? Causes the `resp` binary to be included in bdist_wheel but not in sdist
     'include_package_data': True,
     'entry_points': {
