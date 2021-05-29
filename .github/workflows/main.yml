@@ -40,7 +40,7 @@ jobs:
             os: macos-10.15
             WHEEL_PLAT: macosx_10_15_x86_64
             static_link: 0
-            COMPILER_OVERRIDE: gcc
+            COMPILER_OVERRIDE: /usr/local/bin/gcc
 
           - build: manylinux
             python-version: 3.7
@@ -77,7 +77,6 @@ jobs:
       if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
         brew update
-        brew install gcc
         brew install gcc@4.9
 
     - name: Build sdist
