@@ -107,7 +107,8 @@ jobs:
 
     - name: Verify that libraries are linked into `resp` as expected
       run: |
-        RESP_BINARY="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d)/restrained_ESP_fit/build/resp
+        INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d)"
+        RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         ldd "$RESP_BINARY" || otool -L "$RESP_BINARY"
 
     - name: Run the `resp` binary in lieu of tests (returns 0)
