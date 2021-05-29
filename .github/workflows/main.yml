@@ -40,7 +40,7 @@ jobs:
             os: macos-10.15
             WHEEL_PLAT: macosx_10_15_x86_64
             static_link: 0
-            COMPILER_OVERRIDE: /usr/local/bin/gcc
+            COMPILER_OVERRIDE: /usr/local/bin/gcc-11
 
           - build: manylinux
             python-version: 3.7
@@ -88,6 +88,8 @@ jobs:
         /usr/bin/gcc --version
         echo "====ls /usr/local/bin/gcc-11==="
         ls /usr/local/bin/gcc-11
+        echo "====/usr/local/bin/gcc-11 --version==="
+        /usr/local/bin/gcc-11 --version
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
