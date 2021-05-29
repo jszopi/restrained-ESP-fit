@@ -32,15 +32,9 @@ jobs:
             WHEEL_PLAT: macosx_10_15_x86_64
             static_link: 1
             # Using an older gcc because newer ones actually use clang and I
-            # wasn't able to statically link libquadmath with it.
+            # was getting missing symbols.
             COMPILER_OVERRIDE: /usr/local/bin/gcc-4.9
             VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
-
-          - build: macos
-            os: macos-10.15
-            WHEEL_PLAT: macosx_10_15_x86_64
-            static_link: 0
-            COMPILER_OVERRIDE: /usr/local/bin/gcc-11
 
           - build: manylinux
             python-version: 3.7
@@ -48,6 +42,12 @@ jobs:
             WHEEL_PLAT: manylinux2014_x86_64
             static_link: 1
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+
+        exclude:
+          # Compiling Fortran on MacOS X requires an older gcc, so it's too
+          # complicated for the installation from sdist to be supported
+          - build: macos
+            static-link: 0
 
     env:
       WHEEL_PLAT: ${{ matrix.WHEEL_PLAT }}
@@ -76,22 +76,8 @@ jobs:
     - name: Install homebrew and an older gcc
       if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
-        # brew update
-        # brew install gcc@4.9
-        echo "====ls /usr/local/bin/gcc*===="
-        ls /usr/local/bin/gcc*
-        echo "====which gcc===="
-        which gcc
-        echo "====ls /usr/bin/gcc===="
-        ls /usr/bin/gcc
-        echo "====/usr/bin/gcc --version==="
-        /usr/bin/gcc --version
-        echo "====ls /usr/local/bin/gcc-11==="
-        ls /usr/local/bin/gcc-11
-        echo "====/usr/local/bin/gcc-11 --version==="
-        /usr/local/bin/gcc-11 --version
-        echo "====check cellar==="
-        ls -R /usr/local/Cellar/gcc/
+        brew update
+        brew install gcc@4.9
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}

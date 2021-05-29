@@ -1,6 +1,5 @@
-# Fortran compiler. Only gfortran is compatible with the flags used here and
-# the cross-platform build environments in Travis CI. Specifically, the
-# invocation via gcc is due to an issue with static linking on macOS.
+# Fortran compiler. Only gfortran, or its invocation through gcc,  is
+# compatible with the flags used here.
 FC = $(or $(RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE),gfortran)
 
 FLAGS = -c -O2 -v
