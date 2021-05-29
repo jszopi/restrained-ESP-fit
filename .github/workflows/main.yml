@@ -79,9 +79,6 @@ jobs:
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: python setup.py sdist bdist_wheel --python-tag py3 --plat="$WHEEL_PLAT"
 
-    - name: Verify that libraries are linked into `resp` as expected
-      run: ldd ./restrained_ESP_fit/build/resp || otool -L ./restrained_ESP_fit/build/resp
-
     - name: Validate the created wheel(s)
       run: |
         ls dist
@@ -107,6 +104,11 @@ jobs:
 
     - name: ...in order to test installing from the binary wheel
       run: pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
+
+    - name: Verify that libraries are linked into `resp` as expected
+      run: |
+        RESP_BINARY="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d)/restrained_ESP_fit/build/resp
+        ldd "$RESP_BINARY" || otool -L "$RESP_BINARY"
 
     - name: Run the `resp` binary in lieu of tests (returns 0)
       run: restrained_ESP_fit
