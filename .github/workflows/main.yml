@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         # build: [ quick-linux, manylinux, macos ]
-        build: [ manylinux ]
+        build: [ quick-linux, manylinux ]
         python-version: [3.9]
         include:
           - build: quick-linux
@@ -29,9 +29,11 @@ jobs:
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
           - build: manylinux
             os: ubuntu-18.04
+            python-verion: 3.7
             container: quay.io/pypa/manylinux2014_x86_64
-            WHEEL_PLAT: linux_x86_64
-            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+            WHEEL_PLAT: manylinux2014_x86_64
+            STATIC: 1
+            VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
           # - build: macos
           #   os: macos-10.15
           #   WHEEL_PLAT: macosx_10_15_x86_64
