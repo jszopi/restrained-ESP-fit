@@ -33,12 +33,14 @@ jobs:
             wheel-platform: macosx_10_15_x86_64
             COMPILER_OVERRIDE: /usr/local/bin/gcc-11
             VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
+            expected-libs: 'libSystem libgcc_s'
 
           - build: macos
             os: macos-10.15
             static-link: 0
             wheel-platform: macosx_10_15_x86_64
             COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
+            expected-libs: 'libSystem libgcc_s libgfortran libquadmath'
 
           - build: manylinux
             os: ubuntu-18.04
@@ -122,16 +124,7 @@ jobs:
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
-        EXPECTED_LIBS=" \
-          ${{
-            matrix.build == 'macos' && ( \
-              matrix.static-link == '1' && \
-                'libSystem libgcc_s' || \
-                'libSystem libgcc_s libgfortran libquadmath' \
-            ) \
-          }} \
-        "
-        ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" $EXPECTED_LIBS
+        ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-libs}}
 
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
