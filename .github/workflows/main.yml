@@ -25,15 +25,13 @@ jobs:
           - build: quick-linux
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
-            # vpath dir is necessary for compatibilty, and only affects static
-            # linking...
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
           - build: macos
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
-            COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
+            COMPILER_OVERRIDE: /usr/local/bin/gcc-11
             VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
 
           - build: macos
@@ -66,28 +64,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-
-    - uses: satackey/action-docker-layer-caching@v0.0.11
-      # Ignore the failure of a step and avoid terminating the job.
-      continue-on-error: true
-
-    - name: Where's docker stored?
-      run: |
-        echo "====ls /usr/lib/gcc/x86_64-linux-gnu || true==="
-        ls /usr/lib/gcc/x86_64-linux-gnu || true
-        echo "====which gcc || true==="
-        which gcc || true
-        echo "====gcc --version || true==="
-        gcc --version || true
-        echo "====which gfortran || true==="
-        which gfortran || true
-        echo "====gfortran --version || true==="
-        gfortran --version || true
-        echo "====find ${PATH//:/ } -maxdepth 1 -executable 2>/dev/null | grep -e "fortran\|gcc"==="
-        find ${PATH//:/ } -maxdepth 1 -executable 2>/dev/null | grep -e "fortran\|gcc" || true
-        echo "===={ IFS=:; ls -H $PATH; } | sort | grep -e "fortran\|gcc"==="
-        { IFS=:; ls -H $PATH; } | sort | grep -e "fortran\|gcc" || true
-        # exit 1
 
     - name: Install dependencies
       run: |
