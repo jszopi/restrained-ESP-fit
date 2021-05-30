@@ -43,9 +43,22 @@ def parse_otool_output(stdout):
 
 
 LINK_DEPS_UTIL_DEPENDENT_OPTIONS = {
-    "ldd": {"invocation": ["ldd"], "parser": parse_ldd_output},
-    "otool": {"invocation": ["otool", "-L"], "parser": parse_otool_output},
+    "ldd": {
+        "invocation":["ldd"],
+        "parser": parse_ldd_output
+        "supported_versions": [
+            "ldd (Ubuntu GLIBC 2.27-3ubuntu1.4) 2.27",
+        ]
+    },
+    "otool": {
+        "invocation": ["otool", "-L"],
+        "parser": parse_otool_output,
+        "supported_versions": [
+            "llvm-otool(1): Apple Inc. version cctools-977.1"
+        ]
+    },
 }
+
 
 def parse_args():
 
@@ -63,7 +76,23 @@ def parse_args():
     return parser.parse_args()
 
 
+def ensure_supported_link_deps_util(link_deps_util):
+
+    try:
+        result = subprocess.run([link_deps_util, "--version"], capture_output=True, check=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR: {e.stderr}", file=sys.stderr)
+        sys.exit(e.returncode)
+
+    first_line = result.stdout.split("\n")[0]
+
+    if first_line not in LINK_DEPS_UTIL_DEPENDENT_OPTIONS[link_deps_util]["supported_versions"]:
+        print(f"ERROR: Validation hasn't been tested against the output of:\n\t{first_line}")
+
+
 def get_dynamic_libraries(link_deps_util, object_file):
+
+    ensure_supported_link_deps_util(link_deps_util)
 
     invocation = LINK_DEPS_UTIL_DEPENDENT_OPTIONS[link_deps_util]["invocation"]
     command = [*invocation, object_file]
@@ -93,8 +122,6 @@ def compare_lib_lists(actual, expected):
 if __name__ == "__main__":
 
     args = parse_args()
-
-    # TODO: Do a test invocation if the version is supported.
 
     dynamic_libs = get_dynamic_libraries(args.link_deps_util, args.object_file)
 
