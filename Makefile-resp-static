@@ -1,6 +1,6 @@
-# Fortran compiler. Only gfortran, or its invocation through gcc,  is
+# Fortran compiler. Only gfortran, specifically its invocation through gcc, is
 # compatible with the flags used here.
-FC = $(or $(RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE),gfortran)
+FC = $(or $(RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE),gcc)
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
