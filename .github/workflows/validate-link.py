@@ -45,17 +45,17 @@ def parse_otool_output(stdout):
 LINK_DEPS_UTIL_DEPENDENT_OPTIONS = {
     "ldd": {
         "invocation":["ldd"],
-        "parser": parse_ldd_output
+        "parser": parse_ldd_output,
         "supported_versions": [
             "ldd (Ubuntu GLIBC 2.27-3ubuntu1.4) 2.27",
-        ]
+        ],
     },
     "otool": {
         "invocation": ["otool", "-L"],
         "parser": parse_otool_output,
         "supported_versions": [
             "llvm-otool(1): Apple Inc. version cctools-977.1"
-        ]
+        ],
     },
 }
 
