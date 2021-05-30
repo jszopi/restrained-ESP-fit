@@ -82,10 +82,10 @@ jobs:
       if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
         brew update
-        echo "===which gfortran==="
-        which gfortran || true
         echo "===ls /usr/local/*fortran*==="
-        ls -R /usr/local/*fortran*
+        ls -R /usr/local/gfortran || true
+        echo "===find==="
+        find / -name "*gfortran*"
         # brew install gcc@4.9
 
     - name: Build sdist
