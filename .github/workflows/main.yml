@@ -25,6 +25,7 @@ jobs:
           - build: quick-linux
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
+            COMPILER_OVERRIDE: gcc
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
           - build: macos
@@ -42,6 +43,7 @@ jobs:
             static-link: 1
             wheel-platform: manylinux2014_x86_64
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+            COMPILER_OVERRIDE: gcc
 
         exclude:
           # Compiling Fortran on MacOS X requires an older gcc, so it's too
