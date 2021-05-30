@@ -17,15 +17,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [ quick-linux, macos ]
+        build: [ macos ]
         python-version: [3.9]
         static-link: [0, 1]
         include:
 
-          - build: quick-linux
-            os: ubuntu-18.04
-            wheel-platform: linux_x86_64
-            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+          # - build: quick-linux
+          #   os: ubuntu-18.04
+          #   wheel-platform: linux_x86_64
+          #   # vpath dir is necessary for compatibilty, and only affects static
+          #   # linking...
+          #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
           - build: macos
             os: macos-10.15
@@ -65,8 +67,15 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - uses: satackey/action-docker-layer-caching@v0.0.11
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
+
     - name: Where's docker stored?
-      run: ls -R /home/runner/work/_actions/RalfG/python-wheels-manylinux-build/v0.3.3-manylinux2014_x86_64
+      run: |
+        sudo docker info | grep "Docker Root Dir"
+        ls -R /home/runner/work/_actions/RalfG/python-wheels-manylinux-build/v0.3.3-manylinux2014_x86_64
+        exit 1
 
     - name: Install dependencies
       run: |
