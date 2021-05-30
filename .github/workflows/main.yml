@@ -27,20 +27,19 @@ jobs:
             wheel-platform: linux_x86_64
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
-          # - build: macos
-          #   os: macos-10.15
-          #   static-link: 1
-          #   wheel-platform: macosx_10_15_x86_64
-          #   # Using an older gcc because newer ones actually use clang and I
-          #   # was getting missing symbols.
-          #   COMPILER_OVERRIDE: /usr/local/bin/gcc-4.9
-          #   VPATH_DIR: /usr/local/Cellar/gcc@4.9/4.9.4_2/lib/gcc/4.9
+          - build: macos
+            os: macos-10.15
+            static-link: 1
+            wheel-platform: macosx_10_15_x86_64
+            COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
+            VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
 
           - build: macos
             os: macos-10.15
             static-link: 0
             wheel-platform: macosx_10_15_x86_64
             COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
+            VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
 
           - build: manylinux
             os: ubuntu-18.04
@@ -49,11 +48,11 @@ jobs:
             wheel-platform: manylinux2014_x86_64
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
 
-        exclude:
-          # Compiling Fortran on MacOS X requires an older gcc, so it's too
-          # complicated for the installation from sdist to be supported
-          - build: macos
-            static-link: 1
+        # exclude:
+        #   # Compiling Fortran on MacOS X requires an older gcc, so it's too
+        #   # complicated for the installation from sdist to be supported
+        #   - build: macos
+        #     static-link: 1
 
     env:
       RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static-link }}
