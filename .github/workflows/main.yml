@@ -130,6 +130,7 @@ jobs:
 
     - name: Verify that libraries are linked into `resp` as expected
       run: |
+        ldd --version || otool --version
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
