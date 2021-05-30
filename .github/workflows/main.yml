@@ -26,14 +26,14 @@ jobs:
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
             static-link: 0
-            expected-libs: 'dynamic_dummy'
+            expected-dyn-libs: 'libgfortran libc libquadmath libm libgcc_s'
 
           - build: quick-linux
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
             static-link: 1
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-            expected-libs: 'static_dummy'
+            expected-dyn-libs: 'libm libgcc_s libc'
 
           - build: macos
             os: macos-10.15
@@ -41,14 +41,14 @@ jobs:
             wheel-platform: macosx_10_15_x86_64
             COMPILER_OVERRIDE: /usr/local/bin/gcc-11
             VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
-            expected-libs: 'libSystem libgcc_s'
+            expected-dyn-libs: 'libSystem libgcc_s'
 
           - build: macos
             os: macos-10.15
             static-link: 0
             wheel-platform: macosx_10_15_x86_64
             COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
-            expected-libs: 'libSystem libgcc_s libgfortran libquadmath'
+            expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
 
           - build: manylinux
             os: ubuntu-18.04
@@ -56,7 +56,7 @@ jobs:
             static-link: 1
             wheel-platform: manylinux2014_x86_64
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
-            expected-libs: 'dummy'
+            expected-dyn-libs: 'libm libgcc_s libc'
 
     env:
       RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static-link }}
@@ -133,7 +133,7 @@ jobs:
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
-        ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-libs}}
+        ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
 
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
