@@ -122,11 +122,9 @@ jobs:
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
-        pwd
-        ls -aR .
         EXPECTED_LIBS="${{ matrix.build == 'macos' && (matrix.static-link == '1' && 'libSystem libgcc_s' || 'libSystem libgcc_s libgfortran libquadmath')}}"
         echo $EXPECTED_LIBS
-        ./.github/workflow/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" $EXPECTED_LIBS
+        ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" $EXPECTED_LIBS
 
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
