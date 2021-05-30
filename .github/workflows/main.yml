@@ -22,18 +22,18 @@ jobs:
         static-link: [0, 1]
         include:
 
-          # - build: quick-linux
-          #   os: ubuntu-18.04
-          #   wheel-platform: linux_x86_64
-          #   # vpath dir is necessary for compatibilty, and only affects static
-          #   # linking...
-          #   VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+          - build: quick-linux
+            os: ubuntu-18.04
+            wheel-platform: linux_x86_64
+            # vpath dir is necessary for compatibilty, and only affects static
+            # linking...
+            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
 
           - build: macos
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
-            COMPILER_OVERRIDE: /usr/local/bin/gcc-11
+            COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
             VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
 
           - build: macos
@@ -73,8 +73,18 @@ jobs:
 
     - name: Where's docker stored?
       run: |
-        sudo docker info | grep "Docker Root Dir"
-        ls -R /home/runner/work/_actions/RalfG/python-wheels-manylinux-build/v0.3.3-manylinux2014_x86_64
+        echo "====ls /usr/lib/gcc/x86_64-linux-gnu || true==="
+        ls /usr/lib/gcc/x86_64-linux-gnu || true
+        echo "====which gcc || true==="
+        which gcc || true
+        echo "====gcc --version || true==="
+        gcc --version || true
+        echo "====which gfortran || true==="
+        which gfortran || true
+        echo "====gfortran --version || true==="
+        gfortran --version || true
+        echo "====find ${PATH//:/ } -maxdepth 1 -executable 2>/dev/null | grep -e "fortran\|gcc"==="
+        find ${PATH//:/ } -maxdepth 1 -executable 2>/dev/null | grep -e "fortran\|gcc"
         exit 1
 
     - name: Install dependencies
