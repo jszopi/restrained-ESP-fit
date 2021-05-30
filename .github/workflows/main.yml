@@ -40,7 +40,7 @@ jobs:
             os: macos-10.15
             static-link: 0
             wheel-platform: macosx_10_15_x86_64
-            COMPILER_OVERRIDE: /usr/local/bin/gfortran
+            COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
 
           - build: manylinux
             os: ubuntu-18.04
@@ -82,10 +82,8 @@ jobs:
       if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
         brew update
-        echo "===/usr/local/bin/gfortran-11 --version==="
-        /usr/local/bin/gfortran-11 --version
-        echo "===/usr/local/bin/x86_64-apple-darwin19-gfortran-11 --version==="
-        /usr/local/bin/x86_64-apple-darwin19-gfortran-11 --version
+        echo "===ls /usr/local/Cellar==="
+        ls /usr/local/Cellar
         # brew install gcc@4.9
 
     - name: Build sdist
