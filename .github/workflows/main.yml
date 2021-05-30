@@ -25,8 +25,15 @@ jobs:
           - build: quick-linux
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
+            static-link: 0
+            expected-libs: 'dynamic_dummy'
+
+          - build: quick-linux
+            os: ubuntu-18.04
+            wheel-platform: linux_x86_64
+            static-link: 1
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
-            expected-libs: ${{ matrix.static-link == '1' && 'static_dummy' || 'dynamic_dummy' }}
+            expected-libs: 'static_dummy'
 
           - build: macos
             os: macos-10.15
