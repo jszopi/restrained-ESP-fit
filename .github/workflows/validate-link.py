@@ -102,7 +102,8 @@ def ensure_supported_link_deps_util(link_deps_util):
         not in LINK_DEPS_UTIL_DEPENDENT_OPTIONS[link_deps_util]["supported_versions"]
     ):
         print(
-            f"ERROR: Validation hasn't been tested against the output of:\n\t{first_line}"
+            f"ERROR: Validation hasn't been tested against the output of:\n\t{first_line}",
+            file=sys.stderr,
         )
 
 
