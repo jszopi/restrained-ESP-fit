@@ -31,7 +31,7 @@ jobs:
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
-            COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
+            COMPILER_OVERRIDE: /usr/local/bin/gcc-11
             VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
 
           - build: macos
@@ -39,7 +39,6 @@ jobs:
             static-link: 0
             wheel-platform: macosx_10_15_x86_64
             COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
-            VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
 
           - build: manylinux
             os: ubuntu-18.04
@@ -47,12 +46,6 @@ jobs:
             static-link: 1
             wheel-platform: manylinux2014_x86_64
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
-
-        # exclude:
-        #   # Compiling Fortran on MacOS X requires an older gcc, so it's too
-        #   # complicated for the installation from sdist to be supported
-        #   - build: macos
-        #     static-link: 1
 
     env:
       RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static-link }}
@@ -76,8 +69,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install setuptools wheel twine auditwheel
-        echo "LSLSLSLSLS"
-        ls /usr/local/Cellar/gcc/11.1.0/lib/gcc/11 || true
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
