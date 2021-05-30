@@ -77,16 +77,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine auditwheel
 
-    - name: Install homebrew and an older gcc
-      if: ${{ startsWith(matrix.os, 'macos') }}
-      run: |
-        brew update
-        echo "===ls /usr/local/*fortran*==="
-        ls -R /usr/local/gfortran || true
-        echo "===find==="
-        find / -name "*gfortran*"
-        # brew install gcc@4.9
-
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
       run: python setup.py sdist
