@@ -26,6 +26,7 @@ jobs:
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
             VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+            expected-libs: ${{ matrix.static-link == '1' && 'static_dummy' || 'dynamic_dummy' }}
 
           - build: macos
             os: macos-10.15
@@ -48,6 +49,7 @@ jobs:
             static-link: 1
             wheel-platform: manylinux2014_x86_64
             VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+            expected-libs: 'dummy'
 
     env:
       RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static-link }}

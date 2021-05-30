@@ -30,7 +30,7 @@ def validate_otool_output(lines):
 
 
 def parse_otool_output(stdout):
-    lines = stdout.split("\n")
+    lines = stdout.split("\n")[:-1]
 
     try:
         validate_otool_output(lines)
@@ -38,7 +38,7 @@ def parse_otool_output(stdout):
         print(f"ERROR: otool output validation failed: {e}:\n\t{stdout!r}", file=sys.stderr)
         sys.exit(1)
 
-    lines = [line.strip() for line in lines][1:-1]
+    lines = [line.strip() for line in lines][1:]
     return get_lib_names_from_lines(lines)
 
 
