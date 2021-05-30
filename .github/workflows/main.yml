@@ -121,9 +121,8 @@ jobs:
       run: |
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
-        LINK_DEPS="{{ matrix.build == 'macos' && 'otool -L' || 'ldd' }}"
+        LINK_DEPS="${{ matrix.build == 'macos' && 'otool -L' || 'ldd' }}"
         $LINK_DEPS "$RESP_BINARY"
-        # ldd "$RESP_BINARY" || otool -L "$RESP_BINARY"
 
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
