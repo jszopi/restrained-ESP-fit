@@ -83,7 +83,7 @@ jobs:
       run: |
         brew update
         echo "===which gfortran==="
-        which gfortran
+        which gfortran || true
         echo "===ls /usr/local/*fortran*==="
         ls -R /usr/local/*fortran*
         # brew install gcc@4.9
