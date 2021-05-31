@@ -108,13 +108,12 @@ jobs:
 
     - name: Build wheels (host)
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      env:
+        PLAT: ${{ matrix.wheel-platform }}
       run: |
-        PLAT="${{ matrix.wheel-platform }}"
-
-        if [[ $PLAT ]] ; then
+        if [ $PLAT ] ; then
           PLAT_OPTION="--plat=$PLAT"
         fi
-
         python setup.py bdist_wheel --python-tag py3 "$PLAT_OPTION"
 
     - name: Validate the created wheel(s)
