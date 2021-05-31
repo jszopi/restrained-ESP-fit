@@ -106,7 +106,7 @@ def ensure_supported_link_deps_util(link_deps_util):
             f"ERROR: Validation hasn't been tested against the output of:\n\t{first_line!r}",
             file=sys.stderr,
         )
-        # sys.exit(1)
+        sys.exit(1)
 
 
 def get_dynamic_libraries(link_deps_util, object_file):
