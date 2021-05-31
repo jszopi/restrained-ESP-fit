@@ -147,7 +147,7 @@ jobs:
     # For Test PyPI, we want to be able to release from branches
     - name: Check if the commit is tagged
       id: publishPrep
-      run:
+      run: |
         git log | head -n 100
         git status
         echo "::set-output name=isTagged::$(git tag --points-at HEAD | head -c1 | wc -c)"
