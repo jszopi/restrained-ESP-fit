@@ -112,7 +112,7 @@ jobs:
         PLAT: ${{ matrix.wheel-platform }}
       run: |
         PLAT_OPTION="$(python -c "print(\"--plat=$PLAT\" if \"$PLAT\" else '')")"
-        python setup.py bdist_wheel --python-tag py3 "$PLAT_OPTION"
+        python setup.py bdist_wheel --python-tag py3 $PLAT_OPTION
 
     - name: Validate the created wheel(s)
       if: ${{ startsWith(matrix.os, 'ubuntu') }}  # auditwheel is linux-only
@@ -140,8 +140,6 @@ jobs:
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
         ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
-        strings $RESP_BINARY | grep -e "macosx\|10\.15" || true
-
 
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
