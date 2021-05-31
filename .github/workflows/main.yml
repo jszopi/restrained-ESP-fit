@@ -152,8 +152,5 @@ jobs:
 
     - name: Publish distribution 📦 to Test PyPI
       if: steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
-        skip_existing: true  # discouraged, remove in real PyPI step
+      run: |
+        twine upload --skip-existing --repository-url https://test.pypi.org/legacy/ -u "__token__" -p "${{ secrets.TEST_PYPI_API_TOKEN }}" dist/*
