@@ -27,8 +27,8 @@ The original `resp` program can be compiled with different Fortran compilers and
 These options are currently not exposed from the Python installer; please open an issue if you would benefit from being able to control these options.
 
 A few options are exposed when the `resp` program is to be linked statically, primarily for the purpose of CD of binary wheels.
-If the `RESTRAINED_ESP_FIT_RESP_STATIC` variable is set to "1" during installation, the `resp` binary will be compiled while statically linking the libgfortran and libquadmath libraries.
-You are required to provide the path to where these static libraries can be found by setting the `RESTRAINED_ESP_FIT_RESP_VPATH_DIR` variable.
+If the `RESP_STATIC` variable is set to "1" during installation, the `resp` binary will be compiled while statically linking the libgfortran and libquadmath libraries.
+You are required to provide the path to where these static libraries can be found by setting the `RESP_VPATH` variable.
 <!-- TODO: This can be done by setting PATH or aliasing, the only reason I exposed it as an environment variable was because I could get it to work in Travis. -->
 `gcc` will be used as the compiler and if the one in you `$PATH` isn't suitable, you can override it by setting `RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE`.
 <!-- TODO: How was this allowed in macOS if it doesn't follow the gcc interface? -->

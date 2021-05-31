@@ -1,6 +1,6 @@
 # Fortran compiler. Only gfortran, specifically its invocation through gcc,
 # correctly produces a static link on all tested platforms.
-FC = $(or $(RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE),gcc)
+FC = $(or $(RESP_COMPILER),gcc)
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
@@ -16,7 +16,7 @@ LIB= shared_variables.h
 # the -Wl,Bstatic/dynamic and -l:libgfortran.a approaches only work with the
 # GNU `ld`. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
 # and https://stackoverflow.com/a/5583245
-vpath %.a $(RESTRAINED_ESP_FIT_RESP_VPATH_DIR)
+vpath %.a $(RESP_VPATH)
 .LIBPATTERNS = lib%.a lib%.dylib lib%.so
 STATICLIBS = -lgfortran -lquadmath
 

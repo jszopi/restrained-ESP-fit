@@ -1,6 +1,6 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = $(or $(RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE),gfortran)
+FC = $(or $(RESP_COMPILER),gfortran)
 
 FLAGS = -c -O2
 # -mcmodel=medium

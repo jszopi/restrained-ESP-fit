@@ -32,22 +32,22 @@ jobs:
             os: ubuntu-18.04
             wheel-platform: linux_x86_64
             static-link: 1
-            VPATH_DIR: /usr/lib/gcc/x86_64-linux-gnu/7
+            vpath: /usr/lib/gcc/x86_64-linux-gnu/7
             expected-dyn-libs: 'libm libgcc_s libc'
 
           - build: macos
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
-            COMPILER_OVERRIDE: /usr/local/bin/gcc-11
-            VPATH_DIR: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
+            compiler: /usr/local/bin/gcc-11
+            vpath: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
             expected-dyn-libs: 'libSystem libgcc_s'
 
           - build: macos
             os: macos-10.15
             static-link: 0
             wheel-platform: macosx_10_15_x86_64
-            COMPILER_OVERRIDE: /usr/local/bin/gfortran-11
+            compiler: /usr/local/bin/gfortran-11
             expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
 
           - build: manylinux
@@ -55,13 +55,13 @@ jobs:
             python-version: 3.7
             static-link: 1
             wheel-platform: manylinux2014_x86_64
-            VPATH_DIR: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+            vpath: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
             expected-dyn-libs: 'libm libgcc_s libc'
 
     env:
-      RESTRAINED_ESP_FIT_RESP_STATIC: ${{ matrix.static-link }}
-      RESTRAINED_ESP_FIT_RESP_COMPILER_OVERRIDE: ${{ matrix.COMPILER_OVERRIDE }}
-      RESTRAINED_ESP_FIT_RESP_VPATH_DIR: ${{ matrix.VPATH_DIR }}
+      RESP_STATIC: ${{ matrix.static-link }}
+      RESP_COMPILER: ${{ matrix.compiler }}
+      RESP_VPATH: ${{ matrix.vpath }}
 
     steps:
     - uses: actions/checkout@v2

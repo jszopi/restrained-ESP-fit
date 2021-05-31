@@ -18,9 +18,9 @@ class build_(distutils.command.build.build):
         with tempfile.TemporaryDirectory() as tmpdir:
             copy_tree("resp", tmpdir)
             shutil.rmtree(f"{tmpdir}/build", ignore_errors=True)
-            if os.environ.get("RESTRAINED_ESP_FIT_RESP_STATIC") == "1":
-                if os.environ.get("RESTRAINED_ESP_FIT_RESP_VPATH_DIR") is None:
-                    raise RuntimeError("Requested static linking of `resp` but the environment variable RESTRAINED_ESP_FIT_RESP_VPATH_DIR is not set.")
+            if os.environ.get("RESP_STATIC") == "1":
+                if os.environ.get("RESP_VPATH") is None:
+                    raise RuntimeError("Requested static linking of `resp` but the environment variable RESP_VPATH is not set.")
                 shutil.copy("Makefile-resp-static", f"{tmpdir}/Makefile")
             subprocess.run(["make"], cwd=tmpdir).check_returncode()
             # This will throw if the directory already exists. I'm not sure
