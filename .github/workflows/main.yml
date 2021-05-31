@@ -39,7 +39,7 @@ jobs:
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
-            compiler: '/usr/local/bin/gcc-11 --mmacosx-version-min'
+            compiler: '/usr/local/bin/gcc-11 --mmacosx-version-min=10.15'
             vpath: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
             expected-dyn-libs: 'libSystem libgcc_s'
 
