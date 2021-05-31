@@ -149,6 +149,8 @@ jobs:
       id: publishPrep
       run:
         echo "::set-output name=isTagged::$(git tag --points-at HEAD | head -c1 | wc -c)"
+        git log | head -n 100
+        git status
 
     - name: Publish distribution 📦 to Test PyPI
       if: steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link
