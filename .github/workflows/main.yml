@@ -146,6 +146,8 @@ jobs:
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
 
+    # Note: the macos build publishes the sdist, because the RalfG/manylinux
+    # action only exports the wheels out of the container.
     - name: Publish distribution 📦 to Test PyPI
       if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && matrix.wheel-platform && matrix.static-link
       env:
