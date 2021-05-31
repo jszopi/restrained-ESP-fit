@@ -1,7 +1,7 @@
 # Fortran compiler. Only gfortran is compatible with the flags used here and
 # the cross-platform build environments in Travis CI. Specifically, the
 # invocation via gcc is due to an issue with static linking on macOS.
-FC = $(or $(GCC_OVERRIDE),gcc) 
+FC = $(or $(RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE),gcc)
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
@@ -17,7 +17,8 @@ LIB= shared_variables.h
 # since the -Wl,Bstatic/dynamic approach only works with the GNU `ld`.
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
 # and https://stackoverflow.com/a/5583245
-vpath %.a $(VPATH_DIR)
+# TODO: Could this be removed? IMO this directory should be the default when using gcc
+vpath %.a $(RESTRAINED_ESP_FIT_RESP_VPATH_DIR)
 .LIBPATTERNS = lib%.a lib%.dylib lib%.so
 STATICLIBS = -lgfortran -lquadmath
 
