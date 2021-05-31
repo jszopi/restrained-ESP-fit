@@ -95,7 +95,8 @@ def ensure_supported_link_deps_util(link_deps_util):
         print(f"ERROR: {e.stderr}", file=sys.stderr)
         sys.exit(e.returncode)
 
-    first_line = result.stdout.split("\n")[0]
+    output = result.stdout if link_deps_util != "otool" else result.stderr
+    first_line = output.split("\n")[0]
 
     if (
         first_line

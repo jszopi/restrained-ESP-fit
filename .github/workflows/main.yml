@@ -39,7 +39,7 @@ jobs:
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
-            compiler: '/usr/local/bin/gcc-11 --mmacosx-version-min=10.15'
+            compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=10.15'
             vpath: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
             expected-dyn-libs: 'libSystem libgcc_s'
 
@@ -130,7 +130,6 @@ jobs:
 
     - name: Verify that libraries are linked into `resp` as expected
       run: |
-        ldd --version || otool --version
         INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
