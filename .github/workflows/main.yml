@@ -24,13 +24,11 @@ jobs:
 
           - build: quick-linux
             os: ubuntu-18.04
-            wheel-platform: linux_x86_64
             static-link: 0
             expected-dyn-libs: 'libgfortran libc libquadmath libm libgcc_s'
 
           - build: quick-linux
             os: ubuntu-18.04
-            wheel-platform: linux_x86_64
             static-link: 1
             vpath: /usr/lib/gcc/x86_64-linux-gnu/7
             expected-dyn-libs: 'libm libgcc_s libc'
@@ -110,7 +108,14 @@ jobs:
 
     - name: Build wheels (host)
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
-      run: ${{format('python setup.py bdist_wheel --python-tag py3 --plat={0}', matrix.wheel-platform) }}
+      run: |
+        PLAT="${{ matrix.wheel-platform }}"
+
+        if [[ $PLAT ]] ; then
+          PLAT_OPTION="--plat=$PLAT"
+        fi
+
+        python setup.py bdist_wheel --python-tag py3 "$PLAT_OPTION"
 
     - name: Validate the created wheel(s)
       if: ${{ startsWith(matrix.os, 'ubuntu') }}  # auditwheel is linux-only
