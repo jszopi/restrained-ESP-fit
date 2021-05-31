@@ -47,7 +47,7 @@ config = {
         'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit.resp_wrapper:main"],
     },
     'cmdclass': {'build': build_},
-    'use_scm_version': {"local_scheme": "non-local-version"},
+    'use_scm_version': {"local_scheme": "no-local-version"},
     'setup_requires': ["setuptools_scm"],
     'python_requires': ">=3",
     'classifiers': [
