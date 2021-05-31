@@ -7,7 +7,7 @@ on:
   release:
     types: [ published ]
   schedule:
-    - cron '46 11 * * 6'  # random time, once a week, on the weekend
+    - cron: '46 11 * * 6'  # random time, once a week, on the weekend
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
