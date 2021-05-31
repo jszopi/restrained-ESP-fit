@@ -156,4 +156,4 @@ jobs:
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
-        skip-existing: true  # discouraged, remove in real PyPI step
+        skip_existing: true  # discouraged, remove in real PyPI step
