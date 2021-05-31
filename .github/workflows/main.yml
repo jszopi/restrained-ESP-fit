@@ -152,16 +152,14 @@ jobs:
 
     - name: Debug
       run:
-        echo "${{github.event_name == 'push'}}"
         echo "${{steps.publishPrep.outputs.isTagged}}"
-        echo "${{github.event_name == 'push' && steps.publishPrep.outputs.isTagged}}"
         echo "${{matrix.wheel-platform}}"
-        echo "${{github.event_name == 'push' && steps.publishPrep.outputs.isTagged && matrix.wheel-platform}}"
+        echo "${{steps.publishPrep.outputs.isTagged && matrix.wheel-platform}}"
         echo "${{matrix.static-link}}"
-        echo "${{github.event_name == 'push' && steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link}}"
+        echo "${{steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link}}"
 
     - name: Publish distribution 📦 to Test PyPI
-      if: github.event_name == 'push' && steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link
+      if: steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
