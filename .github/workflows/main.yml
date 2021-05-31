@@ -144,8 +144,14 @@ jobs:
     - name: Check if package passes validation for publishing to PyPI
       run: twine check dist/*
 
+    # For Test PyPI, we want to be able to release from branches
+    - name: Check if the commit is tagged
+      id: publishPrep
+      run:
+        echo "::set-output name=isTagged::$(git tag --points-at HEAD | head -c1 | wc -c)"
+
     - name: Publish distribution 📦 to Test PyPI
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.wheel-platform && matrix.static-link
+      if: github.event_name == 'push' && steps.publishPrep.outputs.isTagged && matrix.wheel-platform && matrix.static-link
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
