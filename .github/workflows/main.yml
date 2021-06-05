@@ -1,35 +1,174 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
   pull_request:
+  release:
+    types: [ published ]
+  schedule:
+    - cron: '46 11 * * 6'  # random time, once a week, on the weekend
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [ quick-linux, macos ]
+        python-version: [3.9]
+        static-link: [0, 1]
+        include:
+
+          - build: quick-linux
+            os: ubuntu-18.04
+            static-link: 0
+            expected-dyn-libs: 'libgfortran libc libquadmath libm libgcc_s'
+
+          - build: quick-linux
+            os: ubuntu-18.04
+            static-link: 1
+            vpath: /usr/lib/gcc/x86_64-linux-gnu/7
+            expected-dyn-libs: 'libm libgcc_s libc'
+
+          - build: macos
+            os: macos-10.15
+            static-link: 1
+            wheel-platform: macosx_10_15_x86_64
+            # The flag was already being set, but I'm not sure what was setting
+            # it, so I'd rather hard-code it in case the behaviour changes.
+            compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=10.15'
+            vpath: /usr/local/Cellar/gcc/11.*/lib/gcc/11
+            expected-dyn-libs: 'libSystem libgcc_s'
+
+          - build: macos
+            os: macos-10.15
+            static-link: 0
+            wheel-platform: macosx_10_15_x86_64
+            compiler: /usr/local/bin/gfortran-11
+            expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
+
+          - build: manylinux
+            os: ubuntu-18.04
+            python-version: 3.7
+            static-link: 1
+            wheel-platform: manylinux2014_x86_64
+            vpath: /opt/rh/devtoolset-9/root/usr/lib/gcc/x86_64-redhat-linux/9
+            expected-dyn-libs: 'libm libgcc_s libc'
+
+    env:
+      RESP_STATIC: ${{ matrix.static-link }}
+      RESP_COMPILER: ${{ matrix.compiler }}
+      RESP_VPATH: ${{ matrix.vpath }}
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        # The default shallow clone isn't enough for setuptools, which inspects
+        # old commit tags to determine the package version
+        # https://github.com/pypa/setuptools_scm/issues/414 (closed)
+        fetch-depth: 0
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine auditwheel
+
+    - name: Expand path globs in the RESP_VPATH env variable
+      if: ${{ contains(env.RESP_VPATH, '*') && !startsWith(matrix.build, 'manylinux') }}
+      run: |
+        RESP_VPATH_EXP="$(python -c "import glob ; matches = glob.glob(\"$RESP_VPATH\") ; assert len(matches) <= 1 ; print(matches[0] if matches else '')")"
+        echo "Setting RESP_VPATH to $RESP_VPATH_EXP"
+        echo "RESP_VPATH=$RESP_VPATH_EXP" >> $GITHUB_ENV
+
+    - name: Build sdist
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      run: python setup.py sdist
+
+    - name: Test installing from sdist
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      run: pip install -v restrained-ESP-fit --no-index --no-binary restrained-ESP-fit -f dist/
+
+    - name: Run the `resp` binary in lieu of tests (returns 0)
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      run: restrained_ESP_fit
+
+    - name: Uninstall restrained-ESP-fit
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      run: pip uninstall --yes restrained-ESP-fit
+
+    - name: Build wheels (manylinux)
+      # Expressions cannot be used as part of the `uses` clause, so we assert
+      # at proximity that we have the right version.
+      if: ${{ startsWith(matrix.build, 'manylinux') && (matrix.wheel-platform == 'manylinux2014_x86_64') }}
+      uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2014_x86_64
+      with:
+        # The `pip wheel` command, that this action's script uses, doesn't seem
+        # to allow setting the platform, resulting in an incorrectly-named wheel
+        python-versions: ''
+        pre-build-command: /opt/python/cp37-cp37m/bin/python setup.py bdist_wheel --python-tag py3 --plat=${{matrix.wheel-platform}}
+
+    - name: Build wheels (host)
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      env:
+        PLAT: ${{ matrix.wheel-platform }}
+      run: |
+        PLAT_OPTION="$(python -c "print(\"--plat=$PLAT\" if \"$PLAT\" else '')")"
+        python setup.py bdist_wheel --python-tag py3 $PLAT_OPTION
+
+    - name: Validate the created wheel(s)
+      if: ${{ startsWith(matrix.os, 'ubuntu') }}  # auditwheel is linux-only
+      run: |
+        # The Makefile links any non-manylinux libraries statically. However,
+        # `auditwheel show` is useful to confirm that nothing slipped through.
+        # It would be even better to assert that nothing needs repairing, which
+        # may be possible through an exit code in the future:
+        # https://github.com/pypa/auditwheel/issues/180
+        #
+        # Note that `auditwheel repair` would not work anyway, as it is only
+        # meant for binary extensions which are later imported through the
+        # interpreter.
+        auditwheel show dist/*.whl
+
+    - name: Test installing from wheel
+      run: pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
+
+    - name: Run the `resp` binary in lieu of tests (returns 0)
+      run: restrained_ESP_fit
+
+    - name: Verify that libraries are linked into `resp` as expected
+      run: |
+        INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
+        RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
+        LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
+        ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
+
+    - name: Check if package passes validation for publishing to PyPI
+      run: twine check dist/*
+
+    # Note: the macos build publishes the sdist, because the RalfG/manylinux
+    # action only exports the wheels out of the container.
+    - name: Publish distribution 📦 to Test PyPI
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && matrix.wheel-platform && matrix.static-link
+      id: pypi-publish
+      env:
+        TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      run: |
+        twine upload --repository-url https://test.pypi.org/legacy/ -u "__token__" -p "$TOKEN" dist/*
+
+    - name: Attach the artifacts to the GitHub release
+      uses: softprops/action-gh-release@v1
+      if: steps.pypi-publish.outcome != 'skipped'
+      with:
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}

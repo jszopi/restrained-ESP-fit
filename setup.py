@@ -1,5 +1,6 @@
 from setuptools import setup
 import distutils.command.build
+from distutils.dir_util import copy_tree
 import os
 import shutil
 import subprocess
@@ -15,14 +16,14 @@ class build_(distutils.command.build.build):
         print("Running build")
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copytree("resp", tmpdir, dirs_exist_ok=True)
+            copy_tree("resp", tmpdir)
             shutil.rmtree(f"{tmpdir}/build", ignore_errors=True)
-            if os.environ.get("RESTRAINED_ESP_FIT_RESP_STATIC") == "1":
-                if os.environ.get("RESTRAINED_ESP_FIT_RESP_VPATH_DIR") is None:
-                    raise RuntimeError("Requested static linking of `resp` but the environment variable RESTRAINED_ESP_FIT_RESP_VPATH_DIR is not set.")
+            if os.environ.get("RESP_STATIC") == "1":
+                if os.environ.get("RESP_VPATH") is None:
+                    raise RuntimeError("Requested static linking of `resp` but the environment variable RESP_VPATH is not set.")
                 shutil.copy("Makefile-resp-static", f"{tmpdir}/Makefile")
             subprocess.run(["make"], cwd=tmpdir).check_returncode()
-            shutil.copytree(tmpdir, "restrained_ESP_fit/build", dirs_exist_ok=True)
+            copy_tree(tmpdir, "restrained_ESP_fit/build")
 
         distutils.command.build.build.run(self)
 
@@ -44,7 +45,8 @@ config = {
         'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit.resp_wrapper:main"],
     },
     'cmdclass': {'build': build_},
-    'use_scm_version': True,
+    # Removing the local version as PyPI doesn't allow it
+    'use_scm_version': {"local_scheme": "no-local-version"},
     'setup_requires': ["setuptools_scm"],
     'python_requires': ">=3",
     'classifiers': [

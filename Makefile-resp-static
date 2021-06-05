@@ -1,7 +1,6 @@
-# Fortran compiler. Only gfortran is compatible with the flags used here and
-# the cross-platform build environments in Travis CI. Specifically, the
-# invocation via gcc is due to an issue with static linking on macOS.
-FC = $(or $(RESTRAINED_ESP_FIT_RESP_GCC_OVERRIDE),gcc)
+# Fortran compiler. Only gfortran, specifically its invocation through gcc,
+# correctly produces a static link on all tested platforms.
+FC = $(or $(RESP_COMPILER),gcc)
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
@@ -13,12 +12,11 @@ OBJS= resp.o
 SRCS= resp.f
 LIB= shared_variables.h
 
-# A trick to statically link selected libraries, which works on macOS,
-# since the -Wl,Bstatic/dynamic approach only works with the GNU `ld`.
-# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
+# A trick to statically link selected libraries, which works on macOS, since
+# the -Wl,Bstatic/dynamic and -l:libgfortran.a approaches only work with the
+# GNU `ld`. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
 # and https://stackoverflow.com/a/5583245
-# TODO: Could this be removed? IMO this directory should be the default when using gcc
-vpath %.a $(RESTRAINED_ESP_FIT_RESP_VPATH_DIR)
+vpath %.a $(RESP_VPATH)
 .LIBPATTERNS = lib%.a lib%.dylib lib%.so
 STATICLIBS = -lgfortran -lquadmath
 

@@ -1,6 +1,6 @@
 
 # Fortran compiler: gfortran, g77, ifort, pgf77...
-FC = gfortran
+FC = $(or $(RESP_COMPILER),gfortran)
 
 FLAGS = -c -O2
 # -mcmodel=medium
