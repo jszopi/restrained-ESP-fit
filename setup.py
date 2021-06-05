@@ -23,8 +23,6 @@ class build_(distutils.command.build.build):
                     raise RuntimeError("Requested static linking of `resp` but the environment variable RESP_VPATH is not set.")
                 shutil.copy("Makefile-resp-static", f"{tmpdir}/Makefile")
             subprocess.run(["make"], cwd=tmpdir).check_returncode()
-            # This will throw if the directory already exists. I'm not sure
-            # if users who re-install will be affected by this.
             copy_tree(tmpdir, "restrained_ESP_fit/build")
 
         distutils.command.build.build.run(self)
