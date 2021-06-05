@@ -83,12 +83,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine auditwheel
 
-    - name: Expand path globs in env variables
+    - name: Expand path globs in the RESP_VPATH env variable
       run: |
-        RESP_VPATH_EXP="$(ls -d $RESP_VPATH)"
+        RESP_VPATH_EXP="$(python -c "import glob ; matches = glob.glob(\"$RESP_VPATH\") ; assert len(matches) <= 1 ; print(matches[0] if matches else '')")"
+        echo "Setting RESP_VPATH to $RESP_VPATH"
         echo "RESP_VPATH=$RESP_VPATH_EXP" >> $GITHUB_ENV
-        RESP_COMPILER_EXP="$(ls -d $RESP_COMPILER)"
-        echo "RESP_COMPILER=$RESP_COMPILER_EXP" >> $GITHUB_ENV
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
