@@ -84,6 +84,7 @@ jobs:
         pip install setuptools wheel twine auditwheel
 
     - name: Expand path globs in the RESP_VPATH env variable
+      if: ${{ contains(env.RESP_VPATH, '*') && !startsWith(matrix.build, 'manylinux') }}
       run: |
         RESP_VPATH_EXP="$(python -c "import glob ; matches = glob.glob(\"$RESP_VPATH\") ; assert len(matches) <= 1 ; print(matches[0] if matches else '')")"
         echo "Setting RESP_VPATH to $RESP_VPATH_EXP"
