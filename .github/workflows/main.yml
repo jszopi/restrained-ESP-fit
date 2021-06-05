@@ -83,15 +83,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine auditwheel
 
-    - name: Build sdist
-      # if: ${{ !startsWith(matrix.build, 'manylinux') }}
-      if: ${{ startsWith(matrix.build, 'macos') }}
+    - name: Expand path globs in env variables
       run: |
-        ls /usr/local/Cellar/gcc/11.*
-        echo "===="
-        ls /usr/local/Cellar/gcc/11.*/lib/gcc/11
-        echo "===="
-        RESP_VPATH=$(ls -d /usr/local/Cellar/gcc/11.*/lib/gcc/11)
+        RESP_VPATH_EXP="$(ls -d $RESP_VPATH)"
+        echo "RESP_VPATH=$RESP_VPATH_EXP" >> $GITHUB_ENV
+        RESP_COMPILER_EXP="$(ls -d $RESP_COMPILER)"
+        echo "RESP_COMPILER=$RESP_COMPILER_EXP" >> $GITHUB_ENV
+
+    - name: Build sdist
+      if: ${{ !startsWith(matrix.build, 'manylinux') }}
+      # if: ${{ startsWith(matrix.build, 'macos') }}
+      run: |
+        echo "RESP_VPATH=$RESP_VPATH"
+        echo "RESP_COMPILER=$RESP_COMPILER"
         python setup.py sdist
 
     - name: Test installing from sdist
