@@ -8,15 +8,26 @@ The method was first described by Bayly et al.¹ using the MK mesh of sampling t
 The mesh needs to be produced independently; see the [jszopi/repESP](https://github.com/jszopi/repESP) repo for some helpers, including extracting ESP fitting points from the output of the Gaussian program and wrapping the calls to the `resp` program in a Python library.
 The program can also be used to fit partial charges to the ESP without any restraints.
 
-History prior to version 2.2 was not preserved (or rather, reconstructed, considering lack of a version controlled repo).
-This version was downloaded in May 2020 from https://upjv.q4md-forcefieldtools.org/RED/ together with other programs in q4md-fft tools 2.0.
-The original README for this version can be found in the [`README-2.4.txt` file](https://github.com/jszopi/resp/blob/master/README-2.4.txt) — see for build instructions.
-Usage instructions are only available for version 2.2 and are hosted at https://upjv.q4md-forcefieldtools.org/RED/resp/ (if link is down, get your browser to display [the repo version](https://github.com/jszopi/resp/blob/566c9207b87ed37c6a8b2e47a581704db762f16c/resp-2.2.html)).
-Use the `restrained_ESP_fit` script to invoke the program, as the name `resp` is now deprecated. 
+# Versioning
 
-I am hoping to rewrite this program in Python in order to encourage users to experiment with their own fitting methods.
-The code will thus soon be available in PyPI, possibly under a less generic name.
-Please open a PR if you'd like it to be available in your system's package manager.
+The purpose of this fork is twofold: easier distribution of the original `resp` program as well as evolution independent from it.
+
+## Relation to `resp`
+
+Multiple versions of `resp` have appeared over the years and this project aims to make available the code for the newer versions.
+Versions `2.y.z` of this project will wrap the corresponding `resp 2.y` code without even a trivial modification.
+The patch version (the `z`) will be incremented upon changes to the wrapping code and CI/CD pipeline.
+If the `resp` program ever comes to use a patch version, the changes will be included in the next patch version of this project.
+While this will cause the version number to no longer have verbatim correspondence, this state should be acceptable, as users the upstream project should never introduce significant changes in a patch release and clients shouldn't have to pin a patch version.
+
+Code history prior to v2.2 was not preserved (or rather, reconstructed, considering lack of a version controlled repo).
+
+## Independent evolution
+
+In order to allow for independent evolution of the program, the name of the project, `restrained-ESP-fit` is different from `resp`.
+The version numbering of the project will reflect the separation from the `resp` version numbers, most likely by using a new major version, i.e. starting from `3.0.0`.
+These versions of the project may alter the calculation logic (the results should be identical, barring potential bug fixes) and the interface to the program.
+I am hoping to rewrite this program in Python in order to encourage users to experiment with their own fitting methods and constraints.
 
 # Usage
 
