@@ -1,10 +1,12 @@
-[![Build Status](https://travis-ci.com/jszopi/restrained-ESP-fit.svg?branch=master)](https://travis-ci.com/jszopi/restrained-ESP-fit)
+[![Build Status](https://github.com/jszopi/restrained-ESP-fit/actions/workflows/main.yml/badge.svg)](https://github.com/jszopi/restrained-ESP-fit/actions?query=branch%3Amaster)
+<!-- TODO: Add PyPI badge -->
 
-# restrained_ESP_fit
+# restrained-ESP-fit
 
-This is a fork of the `resp` program commonly used in computational chemistry for fitting partial charges to values of the provided molecular Electrostatic Potential (ESP) field around a molecule.
+This is a fork of the `resp` program commonly used in computational chemistry for fitting partial atomic charges to values of the provided molecular Electrostatic Potential (ESP) field around a molecule.
 The method was first described by Bayly et al.¹ using the MK mesh of sampling the ESP field² but the program can generally fit charges to any mesh of points.
 The mesh needs to be produced independently; see the [jszopi/repESP](https://github.com/jszopi/repESP) repo for some helpers, including extracting ESP fitting points from the output of the Gaussian program and wrapping the calls to the `resp` program in a Python library.
+The program can also be used to fit partial charges to the ESP without any restraints.
 
 History prior to version 2.2 was not preserved (or rather, reconstructed, considering lack of a version controlled repo).
 This version was downloaded in May 2020 from https://upjv.q4md-forcefieldtools.org/RED/ together with other programs in q4md-fft tools 2.0.
