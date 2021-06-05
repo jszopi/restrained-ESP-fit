@@ -86,15 +86,12 @@ jobs:
     - name: Expand path globs in the RESP_VPATH env variable
       run: |
         RESP_VPATH_EXP="$(python -c "import glob ; matches = glob.glob(\"$RESP_VPATH\") ; assert len(matches) <= 1 ; print(matches[0] if matches else '')")"
-        echo "Setting RESP_VPATH to $RESP_VPATH"
+        echo "Setting RESP_VPATH to $RESP_VPATH_EXP"
         echo "RESP_VPATH=$RESP_VPATH_EXP" >> $GITHUB_ENV
 
     - name: Build sdist
-      if: ${{ !startsWith(matrix.build, 'manylinux') }}
-      # if: ${{ startsWith(matrix.build, 'macos') }}
+      if: ${{ startsWith(matrix.build, 'macos') }}
       run: |
-        echo "RESP_VPATH=$RESP_VPATH"
-        echo "RESP_COMPILER=$RESP_COMPILER"
         python setup.py sdist
 
     - name: Test installing from sdist
