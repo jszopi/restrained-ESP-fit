@@ -42,7 +42,7 @@ jobs:
             # The flag was already being set, but I'm not sure what was setting
             # it, so I'd rather hard-code it in case the behaviour changes.
             compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=10.15'
-            vpath: /usr/local/Cellar/gcc/11.1.0/lib/gcc/11
+            vpath: /usr/local/Cellar/gcc/11.*/lib/gcc/11
             expected-dyn-libs: 'libSystem libgcc_s'
 
           - build: macos
