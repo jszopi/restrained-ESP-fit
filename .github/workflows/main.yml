@@ -100,7 +100,7 @@ jobs:
 
     - name: Run the `resp` binary in lieu of tests (returns 0)
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
-      run: restrained_ESP_fit
+      run: restrained-ESP-fit
 
     - name: Uninstall restrained-ESP-fit
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
@@ -143,11 +143,11 @@ jobs:
       run: pip install -v restrained-ESP-fit --no-index --only-binary restrained-ESP-fit -f dist/
 
     - name: Run the `resp` binary in lieu of tests (returns 0)
-      run: restrained_ESP_fit
+      run: restrained-ESP-fit
 
     - name: Verify that libraries are linked into `resp` as expected
       run: |
-        INSTALLED_MODULE="$(pip show restrained_ESP_fit | grep "^Location" | cut -f2 -d" ")"
+        INSTALLED_MODULE="$(pip show restrained-ESP-fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
         ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
