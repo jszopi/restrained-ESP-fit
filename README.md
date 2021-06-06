@@ -49,7 +49,7 @@ It should be possible for the Windows binaries to be available too; please open 
 
 In order to install this project, you only have to run:
 
-```shell
+```sh
 pip3 install restrained-ESP-fit
 ```
 
@@ -71,7 +71,7 @@ You may need to use a different compiler by setting the `RESP_COMPILER` environm
 Refer to the [CI/CD recipe](./.github/workflows/main.yml) for what value may be suitable for your operating system.
 For example, on macOS X:
 
-```shell
+```sh
 RESP_COMPILER=/usr/local/bin/gfortran-11 pip3 install restrained-ESP-fit
 ```
 
@@ -87,7 +87,7 @@ For example, there are some input format differences between `resp` versions `2.
 To install the latest patch version of `2.2`, run:
 
 
-```shell
+```sh
 pip3 install 'restrained-ESP-fit>=2.2.0,<2.3.0'
 ```
 
