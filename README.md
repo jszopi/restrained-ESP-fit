@@ -1,5 +1,5 @@
 [![Build Status](https://github.com/jszopi/restrained-ESP-fit/actions/workflows/main.yml/badge.svg)](https://github.com/jszopi/restrained-ESP-fit/actions?query=branch%3Amaster)
-<!-- TODO: Add PyPI badge -->
+[![PyPI version](https://img.shields.io/pypi/v/restrained-ESP-fit.svg)](https://pypi.org/project/restrained-ESP-fit/)
 
 # restrained-ESP-fit
 
