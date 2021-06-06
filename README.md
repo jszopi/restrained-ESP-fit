@@ -33,19 +33,38 @@ I am hoping to rewrite this program in Python in order to encourage users to exp
 
 ## Install
 
-### Install from source
+In addition to a publicly available source code, this project is available on the Python Package Index (PyPI).
+This is partly due to the planned rewrite in Python.
+I also found the binary distribution format for Python ("wheels") a simpler alternative to distributing the project over each operating system's package manager.
+The project is currently available for most Linux distributions and macOS X.
+It should be possible for the Windows binaries to be available too; please open an issue if that would be useful to you.
 
-<!-- TODO: This section only pertains to environment variables, add more complete instructions. -->
-The original `resp` program can be compiled with different Fortran compilers and flags.
-These options are currently not exposed from the Python installer; please open an issue if you would benefit from being able to control these options.
+In order to install this project, you only have to run:
 
-A few options are exposed when the `resp` program is to be linked statically, primarily for the purpose of CD of binary wheels.
-If the `RESP_STATIC` variable is set to "1" during installation, the `resp` binary will be compiled while statically linking the libgfortran and libquadmath libraries.
+```
+pip3 install restrained-ESP-fit
+```
+
+`pip3` will prefer installing from a binary distribution, if one compatible with your operating system is available.
+If one is not available, `pip3` will attempt to compile the Fortran code locally.
+This may or may not work, depending on whether the build dependencies can be found on your system.
+One of the aims of this projects is for local compilation not be necessary.
+If installation failed, please open an issue including the output of `pip3 -v install restrained-ESP-fit` and the version numbers of your operating system, Python installation and `pip3`.
+Hopefully, all that's required is the project maintainer adding your operating system to the CI/CD pipeline without requiring any changes on your side.
+
+### Compilation from source
+
+If the compilation from source fails, you may need to use a different compiler by setting the `RESP_COMPILER` environment variable prior to invoking pip.
+Refer to the [CI recipe](./.github/workflows/main.yml) for what value may be suitable for your operating system.
+For example, on mac OS X:
+
+```
+RESP_COMPILER=/usr/local/bin/gfortran-11 pip3 install restrained-ESP-fit
+```
+
+Further, for the sake of producing portable binaries, the `resp` program can be linked statically by setting `RESP_STATIC` environment variable to "1".
+The libraries linked statically are `libgfortran` and `libquadmath`.
 You are required to provide the path to where these static libraries can be found by setting the `RESP_VPATH` variable.
-<!-- TODO: This can be done by setting PATH or aliasing, the only reason I exposed it as an environment variable was because I could get it to work in Travis. -->
-`gcc` will be used as the compiler and if the one in you `$PATH` isn't suitable, you can override it by setting `RESP_COMPILER`.
-<!-- TODO: How was this allowed in macOS if it doesn't follow the gcc interface? -->
-This will be necessary on macOS, where `gcc` after major version 4 actually invoke clang, which isn't compatible with the flags used in the build.
 
 --- 
 
