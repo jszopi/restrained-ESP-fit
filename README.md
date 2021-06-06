@@ -29,6 +29,7 @@ Also see the corresponding Releases for details on how the code was retrieved ([
 
 Later iterations of this project wrap the `resp` code in a Python script, add this README in its current form, and configure CI.
 The original `resp` code can be found in the `resp` subdirectory.
+As the wrapping code evolves, packages will continue to be produced for versions `2.2.z`, `2.4.z` and any future `resp` versions.
 
 ## Independent evolution
 
@@ -106,6 +107,13 @@ Subsequent patch versions may introduce Python bindings, at first with arguments
 Due to the maturity of `resp`, the maintenance workload should be manageable, but any new features may come slowly.
 If you'd like to help out, please get in touch.
 The design of a Pythonic API and a later Python rewrite are interesting challenges that would definitely benefit from more help.
+
+## Development
+
+Development takes place on the `master` branch
+The `resp` version currently being wrapped is `2.4`, but this may change to a different minor version if one is released upstream.
+To continue producing packages wrapping multiple `resp` versions, branches `v2.2.z` and `v2.4.z` will be updated with new developments on `master`.
+These will likely cease to be supported when the development of version `3.0` starts.
 
 --- 
 
