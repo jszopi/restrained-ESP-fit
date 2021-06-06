@@ -29,20 +29,20 @@ class build_(distutils.command.build.build):
 
 
 config = {
-    'name': 'restrained_ESP_fit',
+    'name': 'restrained-ESP-fit',
     'description': 'Fitting partial charges to molecular Electrostatic Potential field',
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
     'maintainer': 'Jan Szopinski',
     'maintainer_email': 'jszopi@users.noreply.github.com',
-    'url': 'https://github.com/jszopi/restrained_ESP_fit',
+    'url': 'https://github.com/jszopi/restrained-ESP-fit',
     'license': 'GPLv3',
     'packages': ["restrained_ESP_fit"],
     'package_data': {"restrained_ESP_fit": ["build/resp"]},
     # Hacky? Causes the `resp` binary to be included in bdist_wheel but not in sdist
     'include_package_data': True,
     'entry_points': {
-        'console_scripts': ["restrained_ESP_fit=restrained_ESP_fit.resp_wrapper:main"],
+        'console_scripts': ["restrained-ESP-fit=restrained_ESP_fit.resp_wrapper:main"],
     },
     'cmdclass': {'build': build_},
     # Removing the local version as PyPI doesn't allow it
