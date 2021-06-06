@@ -157,13 +157,13 @@ jobs:
 
     # Note: the macos build publishes the sdist, because the RalfG/manylinux
     # action only exports the wheels out of the container.
-    - name: Publish distribution 📦 to Test PyPI
+    - name: Publish distribution to PyPI
       if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && matrix.wheel-platform && matrix.static-link
       id: pypi-publish
       env:
-        TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        TOKEN: ${{ secrets.PYPI_API_TOKEN }}
       run: |
-        twine upload --repository-url https://test.pypi.org/legacy/ -u "__token__" -p "$TOKEN" dist/*
+        twine upload -u "__token__" -p "$TOKEN" dist/*
 
     - name: Attach the artifacts to the GitHub release
       uses: softprops/action-gh-release@v1
