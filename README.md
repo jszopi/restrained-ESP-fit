@@ -20,7 +20,15 @@ The patch version (the `z`) will be incremented upon changes to the wrapping cod
 If the `resp` program ever comes to use a patch version, the changes will be included in the next patch version of this project.
 While this will cause the version number to no longer have verbatim correspondence, this state should be acceptable, as users the upstream project should never introduce significant changes in a patch release and clients shouldn't have to pin a patch version.
 
+### Original `resp` code
+
 Code history prior to v2.2 was not preserved (or rather, reconstructed, considering lack of a version controlled repo).
+The original code for v2.2 and v2.4 can be found verbatim in the first two git commits of this repo.
+They can be accessed through the corresponding git tags, namely [here for v2.2](https://github.com/jszopi/restrained-ESP-fit/tree/v2.2) and [here for v2.4](https://github.com/jszopi/restrained-ESP-fit/tree/v2.4).
+Also see the corresponding Releases for details on how the code was retrieved ([v2.2](https://github.com/jszopi/restrained-ESP-fit/releases/tag/v2.2), [v2.4](https://github.com/jszopi/restrained-ESP-fit/releases/tag/v2.4))
+
+Later iterations of this project wrap the `resp` code in a Python script, add this README in its current form, and configure CI.
+The original `resp` code can be found in the `resp` subdirectory.
 
 ## Independent evolution
 
