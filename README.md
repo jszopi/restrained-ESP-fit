@@ -27,9 +27,8 @@ The original code for `v2.2` and `v2.4` can be found verbatim in the first two g
 They can be accessed through the corresponding git tags, namely [here for `v2.2`](https://github.com/jszopi/restrained-ESP-fit/tree/v2.2) and [here for `v2.4`](https://github.com/jszopi/restrained-ESP-fit/tree/v2.4).
 Also see the corresponding Releases for details on how the code was retrieved ([`v2.2`](https://github.com/jszopi/restrained-ESP-fit/releases/tag/v2.2), [`v2.4`](https://github.com/jszopi/restrained-ESP-fit/releases/tag/v2.4))
 
-Later iterations of this project wrap the `resp` code in a Python script, add this README in its current form, and configure CI.
-The original `resp` code can be found in the `resp` subdirectory.
-As the wrapping code evolves, packages will continue to be produced for versions `2.2.z`, `2.4.z` and any future `resp` versions.
+Later iterations of this project moved the original `resp` code into the `resp` subdirectory.
+As the wrapping code evolves, packages will continue to be produced for versions `2.2.z`, `2.4.z` and any future `resp` versions from upstream.
 
 ## Independent evolution
 
@@ -57,27 +56,33 @@ pip3 install restrained-ESP-fit
 `pip3` will prefer installing from a binary distribution, if one compatible with your operating system is available.
 If one is not available, `pip3` will attempt to compile the Fortran code locally.
 This may or may not work, depending on whether the build dependencies can be found on your system.
+
+### Request compatible binaries
+
 One of the aims of this projects is for local compilation not be necessary.
 If installation failed, please open an issue including the output of `pip3 -v install restrained-ESP-fit` and the version numbers of your operating system, Python installation and `pip3`.
 Hopefully, all that's required is the project maintainer adding your operating system to the CI/CD pipeline without requiring any changes on your side.
 
-### Compilation from source
+### Compile from source
 
-If the compilation from source fails, you may need to use a different compiler by setting the `RESP_COMPILER` environment variable prior to invoking pip.
-Refer to the [CI recipe](./.github/workflows/main.yml) for what value may be suitable for your operating system.
-For example, on mac OS X:
+If you don't want to wait for compatible binaries to be provided, you can try to get the compilation from source working on your end.
+One reason why the compilation may have failed is that `gfortran` is not in your `$PATH`.
+You may need to use a different compiler by setting the `RESP_COMPILER` environment variable prior to invoking pip.
+Refer to the [CI/CD recipe](./.github/workflows/main.yml) for what value may be suitable for your operating system.
+For example, on macOS X:
 
 ```
 RESP_COMPILER=/usr/local/bin/gfortran-11 pip3 install restrained-ESP-fit
 ```
 
-Further, for the sake of producing portable binaries, the `resp` program can be linked statically by setting `RESP_STATIC` environment variable to "1".
+For the sake of producing portable binaries, the `resp` program can be linked statically by setting `RESP_STATIC` environment variable to "1".
 The libraries linked statically are `libgfortran` and `libquadmath`.
 You are required to provide the path to where these static libraries can be found by setting the `RESP_VPATH` variable.
+Notice that linking statically uses a different Makefile, and its default compiler is `gcc` instead of `gfortran`.
 
 ### Install alternate version
 
-For reproducibility, you may want to install another version of `restrained-ESP-fit`.
+For reproducibility, you may need to install another version of `restrained-ESP-fit`.
 For example, there are some input format differences between `resp` versions `2.2` and `2.4`.
 To install the latest patch version of `2.2`, run:
 
@@ -110,9 +115,9 @@ The design of a Pythonic API and a later Python rewrite are interesting challeng
 
 ## Development
 
-Development takes place on the `master` branch
-The `resp` version currently being wrapped is `2.4`, but this may change to a different minor version if one is released upstream.
-To continue producing packages wrapping multiple `resp` versions, branches `v2.2.z` and `v2.4.z` will be updated with new developments on `master`.
+Development takes place on the `master` branch.
+The `resp` version currently being wrapped on `master` is `2.4`, but this may change to a newer minor version if one is released upstream.
+To continue producing packages wrapping multiple `resp` versions, branches `v2.2.z` and `v2.4.z` will be updated with any new developments from `master`.
 These will likely cease to be supported when the development of version `3.0` starts.
 
 --- 
