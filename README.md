@@ -66,6 +66,28 @@ Further, for the sake of producing portable binaries, the `resp` program can be 
 The libraries linked statically are `libgfortran` and `libquadmath`.
 You are required to provide the path to where these static libraries can be found by setting the `RESP_VPATH` variable.
 
+## Run
+
+Currently, the only interface to the program is invoking the `restrained-ESP-fit` script.
+Its interface is identical to that of the corresponding `resp` program, e.g. for `v2.4.z`:
+
+```
+restrained-ESP-fit [-O] -i input -e espot [-o output -p punch -q qin -t qout -w qwts -s esout -j espdb -y esqpotpdb -z esmpotpdb]
+```
+
+More detailed usage instructions are only available for v2.2 and are hosted at https://upjv.q4md-forcefieldtools.org/RED/resp/ (if link is down, get your browser to display [the repo version](https://github.com/jszopi/restrained-ESP-fit/blob/v2.2/resp-2.2.html)).
+The usage of v2.4 is likely very similar, but so far I have identified at least one discrepancy in the expected input format.
+v2.4 was also distributed with the [`README-2.4.txt` file](https://github.com/jszopi/resp/blob/v2.4.1/resp/README-2.4.txt) file.
+
+Subsequent patch versions may introduce Python bindings, at first with arguments corresponding directly to the command line options and subsequently a more Pythonic interface.
+
+# Contributing
+
+`resp` has been the effort of multiple people; this fork is merely a spare time project of one developer.
+Due to the maturity of `resp`, the maintenance workload should be manageable, but any new features may come slowly.
+If you'd like to help out, please get in touch.
+The design of a Pythonic API and a later Python rewrite are interesting challenges that would definitely benefit from more help.
+
 --- 
 
 ¹ C. I. Bayly, P. Cieplak, W. D. Cornell and P. A. Kollman, *J. Phys. Chem.*, 1993, **97**, 10269–10280
