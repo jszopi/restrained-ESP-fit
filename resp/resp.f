@@ -1,6 +1,5 @@
         program resp
 C
-C       RESP   version 2.4     November 2013 - q4md-forcefieldtools.org
 C       RESP   version 2.2     January 2011 - q4md-forcefieldtools.org
 C       RESP   version 2.1     October 1994 Jim Caldwell
 C       RESP   version 2.0     September 1992
@@ -19,28 +18,6 @@ C                 DEPARTMENT OF PHARMACEUTICAL CHEMISTRY
 C                 SCHOOL OF PHARMACY
 C                 UNIVERSITY OF CALIFORNIA
 C                 SAN FRANCISCO   CA 94143
-C
-C---------------------------------------------------------------------
-C       
-C       RESP standalone version 2.4:
-C       
-C       Change mol for mep (Molecular Electrostatic Potentail).
-C       Same input for single-MEP and multi-MEP fits
-C       (balnk line required before Intra-Molecular-Charge-Constraint).
-C       Can handle larger MEP grid (up to 999,999 points).
-C       Parameters in shared_variables.h.
-C       Restraint from Henchman and Essex to compute OPLS charges.
-C       Correction of the traceless quadrupole moments.
-C       Computation of traceless quadrupole moments for
-C       multi-Molecular-Electrostatic Potantial.
-C       Modification of esout file.
-C       Introduction of esqpotpdb, asmpotpdb and, espdb files
-C       to assess the quality of the fit.
-C       Computation of r2.
-C       Correction of the standard error of estimate
-C
-C       Authors: J.-P. Becker, F. Wang, P. Cieplak & F.-Y. Dupradeau
-C                http://q4md-forcefieldtools.org/
 C
 C---------------------------------------------------------------------
 C
@@ -101,8 +78,6 @@ C      irstrnt   =  0  ... HARMONIC RESTRAINTS (old style)
 C                =  1  ... HYPERBOLIC RESTRAINT TO CHARGE OF ZERO (default)
 C                =  2  ... ONLY ANALYSIS OF INPUT CHARGES; NO
 C                          CHARGE FITTING IS CARRIED OUT
-C                =  3  ... RESTRAINS DEFINED ACCORDING
-C                          TO HENCHMAN AND HESSEX (J.COMP.CHEM 20,5,483-498(1999))
 c
 c      iunits    =  0  ... atom coordinates in angstroms
 c                =  1       "     "          "  bohrs
@@ -200,8 +175,7 @@ c--------------------------------------------------------------
 C
 C Unit 10 input of ESP's  (mandatory)
 C
-CC      natoms,nesp (2i5)
-C      natoms,nesp (i5,i6)
+C      natoms,nesp (2i5)
 C              X , Y , Z  .   FORMAT (17X,3E16.7)
 C      QUPOT , X , Y , Z  .   FORMAT (1X,4E16.7)
 C
@@ -217,28 +191,24 @@ C
 C--------------------------------------------------------------
 C
 c
-c    usage  resp [-O] -i input -e espot\
-c                 -o output -p punch -q qin -t qout
-c                 -w qwts -s esout -j espdb -y esqpotpdb -z esmpotpdb]
+c    usage: resp -i input -o output -p punch -q qin -t qout \
+c                -e espot -w qwts -s esout 
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       integer icycle
       character*8   TITLE,    keywd
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,espmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,espmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq),a(maxq,maxq),b(maxq),
      & qwtval(maxq),iwttyp(maxq),iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -247,8 +217,6 @@ C       parameter (maxmol = 400)
       COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
-      integer Ntot
-      character(len=maxchar) :: TitleList
 C
 C
 c get the file names
@@ -265,18 +233,15 @@ c
 c
 c if its a multiple molecule run (nmol>0), do mult. mol. input
 c
-c      if( nmol .gt. 1 )call mult_mol
-      call mult_mol(TitleList)
+      if( nmol .gt. 1 )call mult_mol
 c
 c center & reorient molecule once in preparation for dipole & quadrupole
-cCRD() arrays with atom coordinates has not been initilized yet anyway
-c      if( nmol .eq. 1 ) call reornt
+c
+      if( nmol .eq. 1 ) call reornt
 c
 c read in the qm esp, forming the matrices apot(awt) and bpot(bwt)
 c
-c      call matpot
-      Ntot = 0
-      call matpot(Ntot)
+      call matpot
 c
 c process the input (freezing, equivalencing charges)
 c
@@ -312,30 +277,21 @@ c
 c
 c calculate residuals sum-of-squares (chi-square) for the esp's
 c
-      call evlchi( ssvpot, bpot, apot, qcal, iuniq, chipot)
-c      call evlchi( ssvpot, bpot, apot, qcal, iuniq, maxq, chipot)
-c
-c Compute the Pearson's r
-      call pearson
+      call evlchi( ssvpot, bpot, apot, qcal, iuniq, maxq, chipot)
 c
 c now calculate and print dipole and quadrupole moments
-c routine elec_momm_mm does the same job.
-c      if(nmol .eq. 1) call elec_mom
-C calculate and print dipole and quadrupole moments for
-C multicmolecule
-      call elec_mom_mm
+c
+      if(nmol .eq. 1) call elec_mom
 c
 c now punch short summary of charges & important evaluation criteria
 c
-c      call pun_sum
-      call pun_sum(Ntot,TitleList)
+      call pun_sum
 c
       if( icycle .ne. 0 ) go to 10
 c
 c now calculate and print sum-of-squares, sigma, and rms
 c
-c      call pot_out
-      call pot_out(Ntot,TitleList)
+      call pot_out
 c
       if( ioutopt .eq. 1 ) then
 c 
@@ -350,18 +306,16 @@ C-----------------------------------------------------------------------
 c
 C-----------------------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       character *80 card
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10),keywd( 4,4)
       character*8   TITLE,    keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -371,14 +325,13 @@ C       parameter (maxmol = 400)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
 C-----------------------------------------------------------------------
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,espmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     $             esqpotpdb,espmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
 c
       namelist /cntrl/
-     &  ich, INOPT, ioutopt, iuniq, nmep, IQOPT, ihfree,  qwt,
+     &  ich, INOPT, ioutopt, iuniq, nmol ,IQOPT, ihfree,  qwt,
      &  irstrnt,iunits
 C
       UNITS = 1.D0/0.529177249d0
@@ -398,8 +351,7 @@ c
  1000 FORMAT(10A8)
       WRITE(6,1010) (TITLE(I),I=1,10)
  1010 FORMAT(/,t2,'-----------------------------------------------',
-c     $       /,t2,'     Restrained ESP Fit 2.3  Amber 4.1',
-     $       /,t2,'  Restrained ESP Fit 2.4 q4md-forcefieldtools',
+     $       /,t2,'     Restrained ESP Fit 2.3  Amber 4.1',
      $       /,t2,'-----------------------------------------------',
      $       /,t2,10A8, 
      $       /,t2,'-----------------------------------------------'/) 
@@ -426,12 +378,11 @@ c
          write(6,'(''Sorry, you must use namelist input'')')
          stop
    20 continue
-      nmol = nmep
       WRITE(6,1030) INOPT,ioutopt,nmol,IQOPT,
      $ ihfree,irstrnt,iunits,qwt
  1030 FORMAT(
      $       /t2,'inopt       = ',I5,'   ioutopt     = ',I5,
-     $       /t2,'nmep        = ',I5,'   iqopt       = ',I5,
+     $       /t2,'nmol        = ',I5,'   iqopt       = ',I5,
      $       /t2,'ihfree      = ',I5,'   irstrnt     = ',I5,
      $       /t2,'iunits      = ',i5,'   qwt         = ',f12.8)
 c
@@ -440,9 +391,9 @@ c
 c and so we should leave this routine now because routine mult_mol
 c is responsible for the rest of the multiple-molecule reading in.
 c
-c      if( nmol .gt. 1 ) then
+      if( nmol .gt. 1 ) then
         return
-c      endif
+      endif
 c
 c read in fitting weight for q0 and esp point weighting
 c
@@ -533,20 +484,18 @@ c
       stop
       END
 C------------------------------------------------------------------------
-      SUBROUTINE mult_mol(TitleList)
+      SUBROUTINE mult_mol 
 C-----------------------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,     keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -557,12 +506,10 @@ C       parameter (maxmol = 400)
      &               iend(maxmol), nmol
 C-----------------------------------------------------------------------
       integer itmp(maxq),imoll(maxq)
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,espmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,espmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
-      character(len=maxchar) :: TitleList
       DATA ONE,ZERO/1.0D0,0.0D0/
 c
 c this routine reads in multiple molecule input.  In routine readin
@@ -594,17 +541,9 @@ c
       mmlgr= nlgrng
       nlgrng= 0
 c
-      TitleList(1:) = ' '
-c
-      if(nmol .gt. 1) then
-        WRITE(6,'(/,t2,a,i3,a)')
-c     .   '%RESP-I-MULT_MOL,  multiple-molecule run of ', 
-c     .   nmol, ' molecules'
-     .  'multiple-MEP run of ', 
-     .  nmol, ' MEP'
-      else
-        write(6,'(/,x,a)') 'single-MEP run'
-      endif ! (nmol .gt. 1) then
+      WRITE(6,'(/,t2,a,i3,a)')
+     .   '%RESP-I-MULT_MOL,  multiple-molecule run of ', 
+     .   nmol, ' molecules'
 c
       do imol= 1, nmol
 c
@@ -613,14 +552,11 @@ c  - the lagrange constraints to be applied between molecules
 c
          READ(5,'(f10.5)') wtmol(imol)
          WRITE(6,'(/,t2,a,i3,a,f10.3)')
-c     .      'Reading input for molecule ', imol,
-     .      'Reading input for MEP ', imol,
+     .      'Reading input for molecule ', imol,
      .      ' weight:', wtmol(imol)
 c
          READ(5,1000) (TITLE(I),I=1,10)
          WRITE(6,1010) (TITLE(I),I=1,10)
-         backspace(5)
-         read(5,'(a)') TitleList(1+(imol-1)*maxtitle:)
 c
 c read in charge, number of charge centers, and control parameters
 c
@@ -635,11 +571,6 @@ c mol therefore starts in IUNIQ+1 and goes to IUNIQ+icntrs.
 c
          ibeg(imol)= iuniq+1
          iend(imol)= iuniq+icntrs
-         if((iuniq+icntrs).gt.maxq) then
-           write(6,*) "Too many centers !!!"
-           write(6,*) "Increase maxq."
-           stop
-         endif ! ((iuniq+icntrs).gt.maxq) then
 c
 c trap for having too many centers
 c
@@ -683,7 +614,7 @@ c  replacement initial charges q0 from unit 3 if IQOPT=1
 c
       if( IQOPT .gt. 1 ) then
         call amopen(3,qin,'O','F','R')
-        WRITE(6,'(t2,'' since IQOPT>1,'',i4,'' new q0 values'')') iuniq
+        WRITE(6,'(t2,'' since IQOPT=1,'',i4,'' new q0 values'')') iuniq
         WRITE(6,'(t2,'' will be read in from file ESP.Q0 (unit 3)'')')
 c
 c now read in replacement charges
@@ -727,12 +658,9 @@ c
 c        if ivary for mol 2+ is zero it is replaced with the atom number
 c        of mol 1.  
 c
-      if(nmol .gt. 1) then
-        write(6,'(t2,''--------------------------------'')')
-c        write(6,'(t2,''reading mult_mol constraint info'')')
-        write(6,'(t2,''reading mult_esp constraint info'')')
-        write(6,'(t2,''--------------------------------'')')
-      endif ! (nmol .gt. 1) then
+      write(6,'(t2,''--------------------------------'')')
+      write(6,'(t2,''reading mult_mol constraint info'')')
+      write(6,'(t2,''--------------------------------'')')
   600 read(5,'(i5)') ntmp1
       if( ntmp1 .gt. 0 ) then
 c
@@ -777,11 +705,7 @@ c
 
 c charge constraint info
  
-      if(nlgrng .gt. 1) then
-        write(6,'(/,t2,''There are'',i3,'' charge constraints'')')nlgrng
-      else
-        write(6,'(/,t2,''There is'',i3,'' charge constraint'')')nlgrng
-      endif ! (nlgrng .gt. 1) then
+      write(6,'(/,t2,''There are'',i3,'' charge constraints'')')nlgrng
       return
       end
 C-------------------------------------------------------------------
@@ -792,17 +716,15 @@ c
 c called from "readin" and "mult_mol"
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10),keywd( 4,4)
       character*8   TITLE,    keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -870,8 +792,7 @@ c
       return
       end
 c-----------------------------------------------------------------------
-c      SUBROUTINE matpot
-      SUBROUTINE matpot(Ntot)
+      SUBROUTINE matpot
 c
 c read in the electrostatic potential points used in the fitting,
 c building up as we go the matrices for LU decomposition
@@ -879,18 +800,15 @@ c
 c called from Main
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,         keywd
-      COMMON/ESPPE/ apot_pe(maxq,maxq), bpot_pe(maxq)
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -899,21 +817,16 @@ C       parameter (maxmol = 400)
       COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,espmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,espmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
-      integer Ntot
 c
       DO k=1,iuniq
         bpot(k)= 0.0d0
-        bpot_pe(k)= 0.0d0
         bwt(k) = 0.0d0
-        cpot_pe(k) = 0.0d0
         DO j=1,iuniq
            apot(j,k)= 0.0d0
-           apot_pe(j,k)= 0.0d0
            awt(j,k) = 0.0d0
         enddo
       enddo
@@ -921,12 +834,9 @@ c
       call amopen(10,espot,'O','F','R')
 c
       ssvpot= 0.0d0
-      SigmaEpsi_pe = 0.0d0
-      SigmaEpsi2_pe = 0.0d0
       vavrg = 0.0d0
       vavtmp = 0.0d0
       ioff = 1
-      Ntot = 0
 c
       if( nmol .gt. 0 ) then
         inmol= nmol
@@ -938,30 +848,23 @@ c
       endif
 c
       do imol= 1, inmol
-c        read(10,'(2i5)') inat,nesp
-c        WRITE(6,'(/,t2,a,i3,/,t2,a,i5,/,t2,a,i5)')
-        read(10,'(i5,i6)') inat,nesp
-        WRITE(6,'(/,t2,a,i3,/,t2,a,i5,/,t2,a,i6)')
-c     .     'Reading esp"s for molecule ',imol,
-     .     'Reading esp"s for MEP ',imol,
+        read(10,'(2i5)') inat,nesp
+        WRITE(6,'(/,t2,a,i3,/,t2,a,i5,/,t2,a,i5)')
+     .     'Reading esp"s for molecule ',imol,
      .     'total number of atoms      = ',inat,
      .     'total number of esp points = ',NESP
-c        WRITE(6,'(/ /,a)')
-c     .     ' center     X       Y       Z '
-        write(6,*)
-        write(6,'(x,a,5x,a,2(16x,a))') 'Center','X','Y','Z'
+        WRITE(6,'(/ /,a)')
+     .     ' center     X       Y       Z '
         do i = 1,inat
             read(10,52)crd(1,ioff),crd(2,ioff),crd(3,ioff)
             write(6,152)i,crd(1,ioff),crd(2,ioff),crd(3,ioff)
             ioff = ioff + 1
         enddo
    52      format(17X,3e16.7) 
-c  152      format(1X,i4,3e16.7) 
-  152      format(x,i4,2x,3(x,e16.7)) 
+  152      format(1X,i4,3e16.7) 
 c
 c build up matrix elements Ajk according to (SUMi 1/Rik SUMj 1/Rij)
 c
-        Ntot = Ntot + nesp
         DO i= 1,nesp
            read(10, 53, err=940, end=930) espi, xi, yi, zi
    53      format(1X,4e16.7) 
@@ -969,31 +872,25 @@ c
            wt2= wt*wt
            vavtmp = vavtmp + wt*espi
            ssvpot = ssvpot + wt2*espi*espi
-           SigmaEpsi_pe = SigmaEpsi_pe + espi
-           SigmaEpsi2_pe = SigmaEpsi2_pe + espi*espi
            vavrg  = vavrg  + vavtmp/float(NESP)
            DO k= ibeg(imol),iend(imol)
               rik = sqrt( (xi - CRD(1,k))**2 + (yi - CRD(2,k))**2 +
      $                                      (zi - CRD(3,k))**2)
               rik = 1.d0/rik
               bpot(k)  = bpot(k) +     espi*rik
-              bpot_pe(k)  = bpot_pe(k) +     espi*rik
               bwt(k)   = bwt(k)  + wt2*espi*rik
-              cpot_pe(k) = cpot_pe(k) + rik
               apot(k,k)= apot(k,k) +     rik*rik 
-              apot_pe(k,k)= apot_pe(k,k) +     rik*rik 
               awt(k,k) = awt(k,k)  + wt2*rik*rik 
               DO j= k+1, iend(imol)
                  rij = sqrt((xi - CRD(1,j))**2+(yi - CRD(2,j))**2+
      $                                         (zi - CRD(3,j))**2)
                  rij = 1.d0/rij
                  apot(j,k)= apot(j,k) +     rij*rik
-                 apot_pe(j,k)= apot_pe(j,k) +     rij*rik
                  awt(j,k) = awt(j,k)  + wt2*rij*rik
-              enddo ! j= k+1, iend(imol)
-           enddo ! k= ibeg(imol),iend(imol)
-        enddo ! i= 1,nesp
-      enddo ! imol= 1, inmol
+              enddo
+           enddo
+        enddo
+      enddo
 c
 c symmetrize the potenitial and weighted potential matrices
 c
@@ -1001,21 +898,9 @@ c
          DO j= k+1,iuniq
             awt(k,j)= awt(j,k)
             apot(k,j)= apot(j,k)
-            apot_pe(k,j)= apot_pe(j,k)
          enddo
       enddo
       close(10)
-
-      SigmaEpsi_pe = SigmaEpsi_pe / Ntot
-      SigmaEpsi2_pe = SigmaEpsi2_pe / Ntot
-      do k=1,iuniq
-        bpot_pe(k)  = bpot_pe(k) / Ntot
-        cpot_pe(k) = cpot_pe(k) / Ntot
-        do j=1,iuniq
-          apot_pe(j,k)= apot_pe(j,k) / Ntot
-        enddo ! j=1,iuniq
-      enddo ! k=1,iuniq
-
       write(6,900)ssvpot
   900 format(t2,'Initial ssvpot =',f10.3/)
       return
@@ -1034,17 +919,15 @@ c
 c  called from Main
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,     keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -1144,17 +1027,15 @@ c            then modify awork and bwork appropriately
 c
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,           keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -1243,17 +1124,15 @@ c
 c called from "matbld"
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10),keywd( 4,4)
       character*8   TITLE,    keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -1301,13 +1180,8 @@ c use analytic gradient of the hyperbola
 c
 c qcal has the current (calculated) charge
 c
-          if(irstrnt .eq. 1) then ! hyperbolic restraints
-            qwtval(i) = qwt/sqrt(qcal(i)*qcal(i) + 0.01d0)
-            a(i,i)= a(i,i) + qwtval(i)
-          endif ! (irstrnt .eq. 1)
-          if(irstrnt .eq. 3) then ! Henchman's restraints
-            a(i,i)= a(i,i) + qwtval(i) * a(i,i)
-          endif ! (irstrnt .eq. 1)
+          qwtval(i) = qwt/sqrt(qcal(i)*qcal(i) + 0.01d0)
+          a(i,i)= a(i,i) + qwtval(i)
         endif
       enddo
 c
@@ -1324,32 +1198,29 @@ c------------------------------------------------------------------------
       SUBROUTINE cycle( icycle)
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       integer icycle, nqwt
       character*8   TITLE,    keywd
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/  NAT,IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/ TITLE(10),keywd( 4,4)
       COMMON/ESPCOM/ apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      &               qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
-      COMMON/ORIG/ q0(maxq),CRD(3,maxq),IVARY(maxq),IZAN(maxq),qwt,q0tot
+      COMMON/ORIG/   q0(maxq),CRD(3,maxq),IVARY(maxq),IZAN(maxq),qwt,q0tot
       COMMON/worker/ awork(maxq,maxq),bwork(maxq),scr1(maxq),iscr1(maxq)
       COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
 C-----------------------------------------------------------------------
       save nqwt
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,espmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,espmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
 c
       DATA ZERO/0.0D0/
@@ -1398,17 +1269,15 @@ c in preparation for dipole and quadrupole
 c  moment calculation.
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,     keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -1498,17 +1367,15 @@ c
 C ROUTINE TO CALCULATE THE DIPOLE AND QUADRUPOLE MOMENTS 
 C-----------------------------------------------------------------------
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,     keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -1551,387 +1418,7 @@ C convert dipoles from a.u. to debyes, and quadrupoles to debye*angstroms
  
       RETURN
       END
-C-----------------------------------------------------------------------
-      SUBROUTINE elec_mom_mm
-c
-C ROUTINE TO CALCULATE THE DIPOLE AND QUADRUPOLE MOMENTS 
-C-----------------------------------------------------------------------
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
-      COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
-      COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
-      COMMON/RUNLAB/TITLE(10), keywd( 4,4)
-      character*8   TITLE,     keywd
-      COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
-      COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
-     & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
-      common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
-      COMMON/ORIG/q0(maxq),CRD(3,maxq),IVARY(maxq),IZAN(maxq),qwt,q0tot
-      COMMON/worker/awork(maxq,maxq),bwork(maxq),scr1(maxq),iscr1(maxq)
-      COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
-      COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
-     &               iend(maxmol), nmol
-      COMMON/EMMM/ DIPOL_mm(3,maxmol), dipmom_mm(maxmol),
-     &           DIPOLcm_mm(3,maxmol), dipmomcm_mm(maxmol),
-     &          CMAS_mm(3,maxmol),QUAD_mm(6,maxmol),QUADcm_mm(6,maxmol),
-     &           diag_QUAD_mm(6,maxmol),diag_QUADcm_mm(6,maxmol)
 C***********************************************************************
-      ZERO=0.0D0
-      BOHR=0.52917725D0
-      debye=2.541765d0
-C
-C calculate dipole moment
-C
-      do imol = 1,maxmol
-        DIPOL_mm(1,imol) = ZERO
-        DIPOL_mm(2,imol) = ZERO
-        DIPOL_mm(3,imol) = ZERO
-        DIPOLcm_mm(1,imol) = ZERO
-        DIPOLcm_mm(2,imol) = ZERO
-        DIPOLcm_mm(3,imol) = ZERO
-      enddo ! imol = 1,maxmol
-
-      call cmass_mm
-
-      do imol = 1,nmol
-        iAtBeg = ibeg(imol)
-        iAtEnd = iend(imol)
-        do iat = iAtBeg,iAtEnd
-          DIPOL_mm(1,imol) = DIPOL_mm(1,imol) + QCAL(iat)*CRD(1,iat)
-          DIPOL_mm(2,imol) = DIPOL_mm(2,imol) + QCAL(iat)*CRD(2,iat)
-          DIPOL_mm(3,imol) = DIPOL_mm(3,imol) + QCAL(iat)*CRD(3,iat)
-          DIPOLcm_mm(1,imol) = DIPOLcm_mm(1,imol)
-     &                       + QCAL(iat)*(CRD(1,iat) - CMAS_mm(1,imol))
-          DIPOLcm_mm(2,imol) = DIPOLcm_mm(2,imol)
-     &                       + QCAL(iat)*(CRD(2,iat) - CMAS_mm(2,imol))
-          DIPOLcm_mm(3,imol) = DIPOLcm_mm(3,imol)
-     &                       + QCAL(iat)*(CRD(3,iat) - CMAS_mm(3,imol))
-        enddo ! iat = iAtBeg,iAtEnd
-      enddo ! imol = 1,nmol
-
-      do imol = 1,nmol
-        dipmom_mm(imol) = DIPOL_mm(1,imol)*DIPOL_mm(1,imol)
-        dipmom_mm(imol) = dipmom_mm(imol)
-     &                    + DIPOL_mm(2,imol)*DIPOL_mm(2,imol)
-        dipmom_mm(imol) = dipmom_mm(imol)
-     &                    + DIPOL_mm(3,imol)*DIPOL_mm(3,imol)
-        dipmom_mm(imol) = dsqrt(dipmom_mm(imol))
-        dipmomcm_mm(imol) = DIPOLcm_mm(1,imol)*DIPOLcm_mm(1,imol)
-        dipmomcm_mm(imol) = dipmomcm_mm(imol)
-     &                    + DIPOLcm_mm(2,imol)*DIPOLcm_mm(2,imol)
-        dipmomcm_mm(imol) = dipmomcm_mm(imol)
-     &                    + DIPOLcm_mm(3,imol)*DIPOLcm_mm(3,imol)
-        dipmomcm_mm(imol) = dsqrt(dipmomcm_mm(imol))
-      enddo ! imol = 1,nmol
- 
-C convert dipoles from a.u. to debyes.
- 
-      do imol = 1,nmol
-        do i = 1,3
-          DIPOL_mm(i,imol) = DIPOL_mm(i,imol) * debye
-          DIPOLcm_mm(i,imol) = DIPOLcm_mm(i,imol) * debye
-        enddo ! i = 1,3
-        dipmom_mm(imol) = dipmom_mm(imol) * debye
-        dipmomcm_mm(imol) = dipmomcm_mm(imol) * debye
-      enddo ! imol = 1,nmol
-
-C Compute the quadrupole moment
-
-      call QUADM_mm
- 
-      RETURN
-      END
-
-C-----------------------------------------------------------------------
-      SUBROUTINE QUADM_mm
-c
-C ROUTINE TO CALCULATE QUADRUPOLE
-C-----------------------------------------------------------------------
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
-      COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
-      COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
-      COMMON/RUNLAB/TITLE(10), keywd( 4,4)
-      character*8   TITLE,     keywd
-      COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
-      COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
-     & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
-      common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
-      COMMON/ORIG/q0(maxq),CRD(3,maxq),IVARY(maxq),IZAN(maxq),qwt,q0tot
-      COMMON/worker/awork(maxq,maxq),bwork(maxq),scr1(maxq),iscr1(maxq)
-      COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
-      COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
-     &               iend(maxmol), nmol
-      COMMON/EMMM/ DIPOL_mm(3,maxmol), dipmom_mm(maxmol),
-     &           DIPOLcm_mm(3,maxmol), dipmomcm_mm(maxmol),
-     &          CMAS_mm(3,maxmol),QUAD_mm(6,maxmol),QUADcm_mm(6,maxmol),
-     &           diag_QUAD_mm(6,maxmol),diag_QUADcm_mm(6,maxmol)
-C***********************************************************************
-
-      ZERO=0.0D0
-      BOHR=0.52917725D0
-      debye=2.541765d0
-
-      do imol = 1,maxmol
-        do i = 1,6
-          QUAD_mm(i,imol) = ZERO
-          QUADcm_mm(i,imol) = ZERO
-        enddo ! i = 1,6
-      enddo ! imol = 1,maxmol
-
-C Reference is origin of Cartesian coordinate
-      do imol = 1,nmol
-        QXX = ZERO
-        QXY = ZERO
-        QXZ = ZERO
-        QYY = ZERO
-        QYZ = ZERO
-        QZZ = ZERO
-        iAtBeg = ibeg(imol)
-        iAtEnd = iend(imol)
-        do iat = iAtBeg,iAtEnd
-          Qiat = QCAL(iat)
-          Xiat = CRD(1,iat)
-          Yiat = CRD(2,iat)
-          Ziat = CRD(3,iat)
-          X2iat = Xiat * Xiat
-          Y2iat = Yiat * Yiat
-          Z2iat = Ziat * Ziat
-          R2iat = X2iat + Y2iat + Z2iat
-          QXX = QXX + Qiat * (3.0D0 * X2iat - R2iat)
-          QYY = QYY + Qiat * (3.0D0 * Y2iat - R2iat)
-          QZZ = QZZ + Qiat * (3.0D0 * Z2iat - R2iat)
-          QXY = QXY + Qiat * 3.0D0 * Xiat * Yiat
-          QXZ = QXZ + Qiat * 3.0D0 * Xiat * Ziat
-          QYZ = QYZ + Qiat * 3.0D0 * Yiat * Ziat
-
-        enddo ! iat = iAtBeg,iAtEnd
-        QUAD_mm(1,imol) = 0.5D0 * QXX * 2.0
-        QUAD_mm(2,imol) = 0.5D0 * QXY * 2.0
-        QUAD_mm(3,imol) = 0.5D0 * QXZ * 2.0
-        QUAD_mm(4,imol) = 0.5D0 * QYY * 2.0
-        QUAD_mm(5,imol) = 0.5D0 * QYZ * 2.0
-        QUAD_mm(6,imol) = 0.5D0 * QZZ * 2.0
-      enddo ! imol = 1,nmol
-
-C Reference is Center of mass of molecule
-      do imol = 1,nmol
-        do i = 1,6
-          QUAD_mm(i,imol) = QUAD_mm(i,imol) * debye * BOHR
-          QUADcm_mm(i,imol) = QUADcm_mm(i,imol) * debye * BOHR
-        enddo ! i = 1,6
-      enddo ! imol = 1,nmol
-! Compute Quadripole like Gamess
-      do imol = 1,nmol
-        QXX = ZERO
-        QXY = ZERO
-        QXZ = ZERO
-        QYY = ZERO
-        QYZ = ZERO
-        QZZ = ZERO
-        iAtBeg = ibeg(imol)
-        iAtEnd = iend(imol)
-        do iat = iAtBeg,iAtEnd
-         QXX = QXX + (crd(1,iat)-CMAS_mm(1,imol))**2*qcal(iat)
-         QYY = QYY + (crd(2,iat)-CMAS_mm(2,imol))**2*qcal(iat)
-         QZZ = QZZ + (crd(3,iat)-CMAS_mm(3,imol))**2*qcal(iat)
-         QXY = QXY + (crd(1,iat)-CMAS_mm(1,imol))*
-     &         (crd(2,iat)-CMAS_mm(2,imol))*qcal(iat)
-         QYZ = QYZ + (crd(2,iat)-CMAS_mm(2,imol))*
-     &         (crd(3,iat)-CMAS_mm(3,imol))*qcal(iat)
-         QXZ = QXZ + (crd(1,iat)-CMAS_mm(1,imol))*
-     &         (crd(3,iat)-CMAS_mm(3,imol))*qcal(iat)
-        enddo ! iat = iAtBeg,iAtEnd
-        QUADcm_mm(1,imol) = (QXX-0.5d0*(QYY+QZZ))*debye * Bohr * 2.0
-        QUADcm_mm(4,imol) = (QYY-0.5d0*(QZZ+QXX))*debye * Bohr * 2.0
-        QUADcm_mm(6,imol) = (QZZ-0.5d0*(QXX+QYY))*debye * Bohr * 2.0
-        QUADcm_mm(2,imol) = 1.5d0*QXY *debye * Bohr * 2.0
-        QUADcm_mm(3,imol) = 1.5d0*QXZ *debye * Bohr * 2.0
-        QUADcm_mm(5,imol) = 1.5d0*QYZ *debye * Bohr * 2.0
-      enddo ! imol = 1,nmol
-
-C Diagonalize the quadrupole matrices
-      call diagonalize_quad(QUAD_mm,diag_QUAD_mm,nmol)
-      call diagonalize_quad(QUADcm_mm,diag_QUADcm_mm,nmol)
-
-      return
-      end
-
-C-----------------------------------------------------------------------
-      SUBROUTINE diagonalize_quad(quad_in,quad_out,Nmolecule)
-C
-C Diaginlaie the quadrupole matrices
-C-----------------------------------------------------------------------
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-
-      include 'shared_variables.h'
-C       parameter (maxmol = 400)
-      integer :: Nmolecule
-      DIMENSION AIN(3,3),S(3,3)
-      real*8, dimension(6,maxmol) :: quad_in, quad_out
-      integer :: i
-
-      do imol = 1,Nmolecule
-        AIN(1,1) = quad_in(1,imol)
-        AIN(2,2) = quad_in(4,imol)
-        AIN(3,3) = quad_in(6,imol)
-        AIN(1,2) = quad_in(2,imol)
-        AIN(1,3) = quad_in(3,imol)
-        AIN(2,3) = quad_in(5,imol)
-        AIN(2,1) = quad_in(2,imol)
-        AIN(3,1) = quad_in(3,imol)
-        AIN(3,2) = quad_in(5,imol)
-        CALL DIAGM(AIN,S)
-c order quadrupolar moment from highest to lowest
-        do i = 1,2
-          do j = 1,2
-            if(AIN(j,j) .le. AIN(j+1,j+1)) then
-              quad_swap = AIN(j,j)
-              AIN(j,j) = AIN(j+1,j+1)
-              AIN(j+1,j+1) = quad_swap
-            endif ! (AIN(j,j) .le. AIN(j+1,j+1)
-          enddo ! j = 1,2
-        enddo ! i = 1,2
-        quad_out(1,imol) = AIN(1,1)
-        quad_out(4,imol) = AIN(2,2)
-        quad_out(6,imol) = AIN(3,3)
-        quad_out(2,imol) = AIN(1,2)
-        quad_out(3,imol) = AIN(1,3)
-        quad_out(5,imol) = AIN(2,3)
-      enddo ! imol = 1,Nmolecule
-
-      return
-      end subroutine diagonalize_quad
-
-C-----------------------------------------------------------------------
-      SUBROUTINE cmass_mm
-C
-C Computes the center of mass of each molecule to compute dipole moment
-C-----------------------------------------------------------------------
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
-      COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
-      COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
-      COMMON/RUNLAB/TITLE(10), keywd( 4,4)
-      character*8   TITLE,     keywd
-      COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
-      COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
-     & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
-      common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
-      COMMON/ORIG/q0(maxq),CRD(3,maxq),IVARY(maxq),IZAN(maxq),qwt,q0tot
-      COMMON/worker/awork(maxq,maxq),bwork(maxq),scr1(maxq),iscr1(maxq)
-      COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
-      COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
-     &               iend(maxmol), nmol
-      COMMON/EMMM/ DIPOL_mm(3,maxmol), dipmom_mm(maxmol),
-     &           DIPOLcm_mm(3,maxmol), dipmomcm_mm(maxmol),
-     &          CMAS_mm(3,maxmol),QUAD_mm(6,maxmol),QUADcm_mm(6,maxmol),
-     &           diag_QUAD_mm(6,maxmol),diag_QUADcm_mm(6,maxmol)
-C***********************************************************************
-      double precision dMWeight(0:106)
-
-      ZERO=0.0D0
-      DATA (dMWeight(I),I=0,103) /
-     &                      0.0000D0,
-     &                    1.0079D0,4.0026D0,
-     &                    6.9410D0,9.0122D0,10.8110D0,12.0107D0,
-     &                    14.0067D0,15.9994D0,18.9984D0,20.1797D0,
-     &                    22.9898D0,24.3050D0,26.9815D0,28.0855D0,
-     &                    30.9738D0,32.0650D0,35.4530D0,39.9480D0,
-     &                    39.0983D0,40.0780D0,44.9559D0,47.8670D0,
-     &                    50.9415D0,51.9961D0,54.9380D0,55.8450D0,
-     &                    58.9332D0,58.6934D0,63.5460D0,65.3900D0,
-     &                    69.7230D0,72.6400D0,74.9216D0,78.9600D0,
-     &                    79.9040D0,83.8000D0,85.4678D0,87.6200D0,
-     &                    88.9058D0,91.2240D0,92.9064D0,95.9400D0,
-     &                    97.9072D0,101.0700D0,102.9055D0,106.4200D0,
-     &                    107.8682D0,112.4110D0,114.8180D0,118.7100D0,
-     &                    121.7600D0,127.6000D0,126.9045D0,131.2930D0,
-     &                    132.9054D0,137.3270D0,138.9055D0,140.1160D0,
-     &                    140.9076D0,144.2400D0,144.9127D0,150.3600D0,
-     &                    151.9640D0,157.2500D0,158.9253D0,162.5000D0,
-     &                    164.9303D0,167.2590D0,168.9342D0,173.0400D0,
-     &                    174.9670D0,178.4900D0,180.9479D0,183.8400D0,
-     &                    186.2070D0,190.2300D0,192.2170D0,195.0780D0,
-     &                    196.9665D0,200.5900D0,204.3833D0,207.2000D0,
-     &                    208.9804D0,208.9824D0,209.9871D0,222.0176D0,
-     &                    223.0197D0,226.0254D0,227.0277D0,232.0381D0,
-     &                    231.0359D0,238.0289D0,237.0482D0,244.0642D0,
-     &                    243.0614D0,247.0704D0,247.0703D0,251.0796D0,
-     &                    252.0830D0,257.0951D0,258.0984D0,259.1010D0,
-     &                    262.1097D0 /
-
-c Decide to use masses from Gamess
-c     DATA (dMWeight(I),I=0,54)  /
-c    *   0.000000D+00,
-c    *   1.007825D+00,4.0026D+00,7.01600D+00,9.01218D+00,11.00931D+00,
-c    *   12.0D+00,14.00307D+00,15.99491D+00,18.99840D+00,19.99244D+00,
-c    *   22.9898D+00,23.98504D+00,26.98153D+00,27.97693D+00,
-c    *   30.97376D+00,31.97207D+00,34.96885D+00,39.948D+00,
-c    *   38.96371D+00,39.96259D+00,44.95592D+00,47.90D+00,50.9440D+00,
-c    *   51.9405D+00,54.9381D+00,55.9349D+00,58.9332D+00,57.9353D+00,
-c    *   62.9298D+00,63.9291D+00,68.9257D+00,73.9219D+00,74.9216D+00,
-c    *   79.9165D+00,78.9183D+00,83.9115D+00,
-c    *   84.9117D+00,87.9056D+00,89.9054D+00,89.9043D+00,92.9060D+00,
-c    *   97.9055D+00,97.0D+00,101.9037D+00,102.9048D+00,105.9032D+00,
-c    *   106.9041D+00,113.9036D+00,114.9041D+00,119.9022D+00,
-c    *   120.9038D+00,129.9067D+00,126.9044D+00,131.9042D+00/
-c     DATA (dMWeight(I),I=55,106)  /
-c    *   132.9054D+00,137.9052D+00,138.9063D+00,139.9054D+00,
-c    *   140.9076D+00,141.9077D+00,144.9127D+00,151.9197D+00,
-c    *   152.9212D+00,157.9241D+00,158.9253D+00,163.9292D+00,
-c    *   164.9303D+00,165.9303D+00,168.9342D+00,173.9389D+00,
-c    *   174.9408D+00,179.9465D+00,180.9480D+00,183.9509D+00,
-c    *   186.9557D+00,191.9615D+00,192.9629D+00,194.9648D+00,
-c    *   196.9665D+00,201.9706D+00,
-c    *   204.9744D+00,207.9766D+00,208.9804D+00,208.9824D+00,
-c    *   209.9871D+00,222.0176D+00,
-c    *   223.0197D+00,226.0254D+00,
-c    *   227.0278D+00,232.0381D+00,231.0359D+00,238.0508D+00,
-c    *   237.0482D+00,244.0642D+00,243.0614D+00,247.0703D+00,
-c    *   247.0703D+00,251.0796D+00,252.0829D+00,257.0751D+00,
-c    *   258.0986D+00,259.1009D+00,260.1053D+00,261.1087D+00,
-c    *   2*0.0D+00/
-
-
-      do imol = 1,nmol
-        iAtBeg = ibeg(imol)
-        iAtEnd = iend(imol)
-        Summ = ZERO
-        SummX = ZERO
-        SummY = ZERO
-        SummZ = ZERO
-        do iat = iAtBeg,iAtEnd
-          iZiat = IZAN(iat)
-          dMWiat = dMWeight(iZiat)
-          Summ = Summ + dMWiat
-          SummX = SummX + CRD(1,iat) * dMWiat
-          SummY = SummY + CRD(2,iat) * dMWiat
-          SummZ = SummZ + CRD(3,iat) * dMWiat
-        enddo ! iat = iAtBeg,iAtEnd
-        CMAS_mm(1,imol) = SummX / Summ
-        CMAS_mm(2,imol) = SummY / Summ
-        CMAS_mm(3,imol) = SummZ / Summ
-      enddo  ! imol = 1,nmol
-
-      return
-      end
-C-----------------------------------------------------------------------
       SUBROUTINE CMASS(XC,YC,ZC,C,IATOM,NATOM,WT,maxq)
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
  
@@ -1940,7 +1427,7 @@ c  called from "reornt"
 C      THIS SUBROUTINE CALCULATES THE CENTER OF MASS OF THE
 C      MOLECULE.
  
-      DIMENSION C(3,maxq),IATOM(maxq),WT(110)
+      DIMENSION C(3,maxq),IATOM(maxq),WT(2)
  
       DATA ZERO/0.0D0/
  
@@ -1992,7 +1479,7 @@ C     COMPONENTS.
 C
 C
       DIMENSION D(3),AIN(3,3),S(3,3)
-      DIMENSION CO(3,maxq),IATOM(maxq),WT(110)
+      DIMENSION CO(3,maxq),IATOM(maxq),WT(2)
 C
       DATA ZERO /0.0D0/
 C
@@ -2177,12 +1664,12 @@ C   THIS SUBROUTINE CALCULATES THE COMPONENTS OF THE QUADROPOLE MOMENT
 C
 C STORE IN QUAD
 C
-      QUAD(1) = 0.5 * QXX
-      QUAD(2) = 0.5 * QYY
-      QUAD(3) = 0.5 * QZZ
-      QUAD(4) = 0.5 * QXY
-      QUAD(5) = 0.5 * QXZ
-      QUAD(6) = 0.5 * QYZ
+      QUAD(1) = QXX
+      QUAD(2) = QYY
+      QUAD(3) = QZZ
+      QUAD(4) = QXY
+      QUAD(5) = QXZ
+      QUAD(6) = QYZ
 C
       RETURN
       END
@@ -2193,26 +1680,22 @@ c
 c
 c     OUTPUT: (to common)
 c
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,esmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,esmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
 c
       character *80 arg
 c
       integer iarg, narg
-      input = 'input'           ! -i
-      output = 'output'         ! -o
-      punch = 'punch'           ! -p
-      qin= 'qin'                ! -q
-      qout= 'qout'              ! -t 
-      espot = 'espot'           ! -e
-      qwts = 'qwts'             ! -w
-      esout = 'esout'           ! -s
-      espdb = 'espdb'           ! -j
-      esqpotpdb = 'esqpotpdb'   ! -y
-      esmpotpdb = 'esmpotpdb'   ! -z
+      input = 'input'       ! -i
+      output = 'output'     ! -o
+      punch = 'punch'       ! -p
+      qin= 'qin'            ! -q
+      qout= 'qout'          ! -t 
+      espot = 'espot'       ! -e
+      qwts = 'qwts'         ! -w
+      esout = 'esout'       ! -s
 c
 c     --- default for output files: 'N'ew
 c
@@ -2252,15 +1735,6 @@ c
            elseif (arg .eq. '-w') then
                 iarg = iarg + 1
                 call getarg(iarg,qwts)
-           elseif (arg .eq. '-j') then
-                iarg = iarg + 1
-                call getarg(iarg,espdb)
-           elseif (arg .eq. '-y') then
-                iarg = iarg + 1
-                call getarg(iarg,esqpotpdb)
-           elseif (arg .eq. '-z') then
-                iarg = iarg + 1
-                call getarg(iarg,esmpotpdb)
            else
                 if (arg .eq. ' ') go to 20
                 write(6,'(/,5x,a,a)') 'unknown flag: ',arg
@@ -2281,18 +1755,13 @@ c
       endif
       return
  9000 format(/,t2,
-     $'usage resp 2.4 q4md-forcefieldtools:',
-     $' resp [-O] -i input -e espot',
-     $' [-o output -p punch -q qin -t qout',
-     $' -w qwts -s esout -j espdb -y esqpotpdb -z esmpotpdb]',
-     &/)
+     $'usage: resp [-O] -i input -o output -p punch -q qin -t qout','
+     $   -e espot -w qwts -s esout ')
       end
 c------------------------------------------------------------------------
-      subroutine evlchi(ssvpot,bpot,apot,qcal,iuniq,chipot)
-c      subroutine evlchi(ssvpot,bpot,apot,qcal,iuniq,maxq,chipot)
+      subroutine evlchi(ssvpot,bpot,apot,qcal,iuniq,maxq,chipot)
 
       implicit double precision (a-h,o-z)
-      include 'shared_variables.h'
       dimension bpot(maxq), apot(maxq,maxq), 
      $         qcal(maxq)
 c
@@ -2326,71 +1795,7 @@ c
       return
       end
 c------------------------------------------------------------------------
-      subroutine pearson
-c------------------------------------------------------------------------
-c Compute the Person's coefficient.
-c x is the initial value of the potential 
-c y is the the potential generated by the fitted charges.
-c RSquare = (AvXY - AvX * AvY)
-c / (sqrt(AvX2 - AvX*AvX) * sqrt(AvY2 - AvY*AvY))
-c------------------------------------------------------------------------
-
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
-      COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
-      COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
-      COMMON/RUNLAB/TITLE(10),keywd( 4,4)
-      character*8   TITLE,    keywd
-      COMMON/ESPPE/ apot_pe(maxq,maxq), bpot_pe(maxq)
-      COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
-      COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
-     & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
-      common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
-      COMMON/ORIG/q0(maxq),CRD(3,maxq),IVARY(maxq),IZAN(maxq),qwt,q0tot
-      COMMON/worker/awork(maxq,maxq),bwork(maxq),scr1(maxq),iscr1(maxq)
-      COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
-      COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
-     &               iend(maxmol), nmol
-
-      AvX = SigmaEpsi_pe
-
-      AvX2 = SigmaEpsi2_pe
-      
-      AvY = 0.0d0
-      do j = 1,iuniq
-        AvY = AvY + qcal(j) * cpot_pe(j)
-      enddo ! j = 1,iuniq
-
-      AvY2 = 0.0d0
-      do j = 1,iuniq
-        do k = 1,iuniq
-          AvY2 = AvY2 + qcal(j) * qcal(k) * apot_pe(j,k)
-        enddo ! k = 1,iuniq
-      enddo ! j = 1,iuniq
-
-      AvXY = 0.0d0
-      do j = 1,iuniq
-        AvXY = AvXY + qcal(j) * bpot_pe(j)
-      enddo ! j = 1,iuniq
-
-      SqA = AvX2 - AvX * AvX
-
-      SqB = AvY2 - AvY * AvY
-
-      RSquare = AvXY - AvX * AvY
-      RSquare = RSquare * RSquare
-      RSquare = RSquare / (SqA * SqB)
-
-      return
-      end
-c------------------------------------------------------------------------
-c      subroutine pun_sum
-      subroutine pun_sum(Ntot,TitleList)
+      subroutine pun_sum
 C************************************************************************
 C                              AMBER                                   **
 C                                                                      **
@@ -2413,17 +1818,15 @@ c  called from Main
 c
 C***********************************************************************
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10),keywd( 4,4)
       character*8   TITLE,    keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -2433,56 +1836,43 @@ C       parameter (maxmol = 400)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
 C***********************************************************************
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,esmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,esmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
-      integer Ntot
-      character(len=maxchar) :: TitleList
+c
 c
       QCRTRN= SQRT(chipot/ssvpot)
       ssvtot = ssvpot
 c
 c calculate standard error of estimate and correlation coefficients
 c
-c      SIGMA = SQRT(chipot/FLOAT(NESP))
-      SIGMA = SQRT(chipot/FLOAT(Ntot))
+      SIGMA = SQRT(chipot/FLOAT(NESP))
 c
 c punch name, one-line summary, and charges:
 c
       call amopen(7,punch,owrite,'F','W')
-C      WRITE(7,1110) (TITLE(I),I=1,10)
-      write(7,*)
-      do imol = 1,nmol
-         write(7,'(x,i4,2x,a)') imol,
-     &          trim(TitleList(1+(imol-1)*maxtitle:imol*maxtitle))
-      enddo ! imol = 1,nmol
+      WRITE(7,1110) (TITLE(I),I=1,10)
  1110 FORMAT(/,10A8)
       write(7, 1230) IQOPT, irstrnt, ihfree,qwt
  1230 format(/,'iqopt   irstrnt  ihfree     qwt'/,3(i3,4x),f12.6)
-c      write(7,1235)  QCRTRN, dipmom, (QUAD(I), I=1,3)
+      write(7,1235)  QCRTRN, dipmom, (QUAD(I), I=1,3)
  1235 format(/t2,'rel.rms   dipole mom       Qxx      Qyy      Qzz',/
      $ t2,5f10.5)
       WRITE(7,1200)
  1200 FORMAT(/,10X,'Point charges before & after optimization',/,4X,
      .  'NO',3X,'At.No.',4x,'q0',11X,'q(opt)   IVARY  d(rstr)/dq ')
- 1201 FORMAT(/,10X,
-     *    'Point Charges Before & After Optimization',/ /,4X,'no.',
-     *    2x,'At.no.',4x,'q(init)',7X,'q(opt)     ivary    d(rstr)/dq')
       icnt = 1
       jcnt = 1
       DO j=1,iuniq
       WRITE(7,1210) j,izan(j),q0(j), qcal(j), IVARY(j), qwtval(j)
       jcnt = jcnt + 1
       if (jcnt.gt.iend(icnt))then
-c         write(6,'( )') 
-         write(7,'( )') 
+         write(6,'( )') 
          icnt = icnt + 1
       endif
       enddo
-c 1210 format(2x,i4,2x,i4,1x,f10.6,5x,f10.6, i5, f12.6, f12.3)
- 1210 FORMAT(t2,2i4, 2(5x,f10.6), i7, f15.6, f12.3)
+ 1210 format(2x,i4,2x,i4,1x,f10.6,5x,f10.6, i5, f12.6, f12.3)
 c
       call amopen(19,qout,owrite,'F','W')
       write(19,'(8f10.6)') (Qcal(I),i=1,iuniq)
@@ -2491,8 +1881,7 @@ c
       RETURN
       END
 C---------------------------------------------------------------------
-c      SUBROUTINE POT_OUT
-      SUBROUTINE POT_OUT(Ntot,TitleList)
+      SUBROUTINE POT_OUT
 C************************************************************************
 C                              AMBER                                   **
 C                                                                      **
@@ -2514,17 +1903,15 @@ c
 c  called from Main
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, iuniq,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10),keywd( 4,4)
       character*8   TITLE,    keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -2533,23 +1920,12 @@ C       parameter (maxmol = 400)
       COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
-      COMMON/EMMM/ DIPOL_mm(3,maxmol), dipmom_mm(maxmol),
-     &           DIPOLcm_mm(3,maxmol), dipmomcm_mm(maxmol),
-     &          CMAS_mm(3,maxmol),QUAD_mm(6,maxmol),QUADcm_mm(6,maxmol),
-     &           diag_QUAD_mm(6,maxmol),diag_QUADcm_mm(6,maxmol)
       DATA ZERO/0.0D0/,AU2CAL/627.5095D0/
-      integer Ntot
-      character(len=maxchar) :: TitleList
 C
 C
 C     ---- PRINT THE OPTIMIZED CHARGES AND COORDINATES ----
 C
-C      WRITE(6,1110) (TITLE(I),I=1,10)
-      write(6,*)
-      do imol = 1,nmol
-         write(6,'(x,i4,2x,a)') imol,
-     &          trim(TitleList(1+(imol-1)*maxtitle:imol*maxtitle))
-      enddo ! imol = 1,nmol
+      WRITE(6,1110) (TITLE(I),I=1,10)
 c
 c print the charges
 c
@@ -2573,8 +1949,7 @@ c
 c
 c calculate standard error of estimate
 c
-c      SIGMA = SQRT(chipot/FLOAT(NESP))
-      SIGMA = SQRT(chipot/FLOAT(Ntot))
+      SIGMA = SQRT(chipot/FLOAT(NESP))
 c
 c now write all this stuff out
 c
@@ -2586,24 +1961,20 @@ c
       WRITE(7,1080) SIGMA
       WRITE(6,1090) QCRTRN
       WRITE(7,1090) QCRTRN
-      WRITE(6,1140) RSquare
-      WRITE(7,1140) RSquare
 C
 C     ----- PRINT THE DIPOLE , QUADRUPOLE AND CENTER OF MASS ----
 C
-      call wrt_stat_mom(6)
-C      call wrt_stat_mom(7)
-C      if(nmol.eq.1) then
-C         WRITE(6,1340)
-C         write(6,1350) ( CMAS(I), I=1,3)
-C         WRITE(6,1360)
-C         write(6,1370) ( DIPOL(I), I=1,3)
-C         write(6,1375) dipmom
-C         write(7,1375) dipmom
-C         WRITE(6,1380)
-C         write(6,1390) ( QUAD(I), I=1,3)
-C         write(6,1395) ( QUAD(I), I=4,6)
-C      endif
+      if(nmol.eq.1) then
+         WRITE(6,1340)
+         write(6,1350) ( CMAS(I), I=1,3)
+         WRITE(6,1360)
+         write(6,1370) ( DIPOL(I), I=1,3)
+         write(6,1375) dipmom
+         write(7,1375) dipmom
+         WRITE(6,1380)
+         write(6,1390) ( QUAD(I), I=1,3)
+         write(6,1395) ( QUAD(I), I=4,6)
+      endif
 c
  1000 FORMAT(/ /,10X,'Point charges after optimization',/ /,4X,
      *'NO',15X,'X',15X,'Y',15X,'Z',10X, 'Qoptim',/)
@@ -2614,13 +1985,12 @@ c
  1080 FORMAT(2x,
      *'The std err of estimate (sqrt(chipot/N))',t50,f15.5)
  1090 FORMAT(2x, 'ESP relative RMS (SQRT(chipot/ssvpot))',t50,f15.5)
- 1140 FORMAT(2x, 'The Pearson correlation coefficient (r2)',t50,f15.5)
  1110 FORMAT(/,10A8)
  1130 FORMAT(/,t2,'Net charge on the system =',F10.7)
  1200 FORMAT(/,10X,
      *    'Point Charges Before & After Optimization',/ /,4X,'no.',
      *    2x,'At.no.',4x,'q(init)',7X,'q(opt)     ivary    d(rstr)/dq')
- 1210 FORMAT(t2,2i4, 2(5x,f10.6), i7, f15.6, f12.3)
+ 1210 format(t2,2i4, 2(5x,f10.6), i7, f15.6, f12.3)
  1340 FORMAT(/,t2,'Center of Mass (Angst.):',/)
  1350 FORMAT(t2,'X  =',F10.5,5X,' Y  =',F10.5,5X,' Z  =',F10.5)
  1360 FORMAT(/,t2,'Dipole (Debye):',/)
@@ -2632,95 +2002,6 @@ c
 c
       return
       end
-c-------------------------------------------------------------------------
-      subroutine wrt_stat_mom(UnitNum)
-c
-c Write centers of mass, dipoles and quadrupoles
-c
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-      COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
-     &               iend(maxmol), nmol
-      COMMON/EMMM/ DIPOL_mm(3,maxmol), dipmom_mm(maxmol),
-     &           DIPOLcm_mm(3,maxmol), dipmomcm_mm(maxmol),
-     &          CMAS_mm(3,maxmol),QUAD_mm(6,maxmol),QUADcm_mm(6,maxmol),
-     &           diag_QUAD_mm(6,maxmol),diag_QUADcm_mm(6,maxmol)
-      integer :: UnitNum, imol
-
-      write(UnitNum,*)
-      write(UnitNum,'(x,a)')'Center of Mass (a.u.):'
-      write(UnitNum,1345)
-      do imol = 1,nmol
-        write(UnitNum,1355) imol, (CMAS_mm(i,imol),i=1,3)
-      enddo ! imol = 1,nmol
-      write(UnitNum,*)
-      write(UnitNum,'(x,a)')"Dipole moments (Debye) computed:"
-      write(UnitNum,'(x,a)')
-     &  "-with respect to the origin of coordinates (ooc)"
-      write(UnitNum,'(x,a)')"-with respect to the center of mass (com)"
-      write(UnitNum,1405)
-        do imol = 1,nmol
-          write(UnitNum,1400)
-     &     imol, dipmom_mm(imol), (DIPOL_mm(i,imol),i=1,3)
-          write(UnitNum,1410)
-     &         imol, dipmomcm_mm(imol), (DIPOLcm_mm(i,imol),i=1,3)
-          if(imol .lt. nmol) write(UnitNum,*)
-        enddo ! imol = 1,nmol
-      write(UnitNum,*)
-      write(UnitNum,'(x,a)') "Traceless Quadrupole moments (Buckingham)"
-     &              //" computed:"
-      write(UnitNum,'(x,a)')
-     &        "-with respect to the origin of coordinates (ooc)"
-      write(UnitNum,'(x,a)')"-with respect to the center of mass (com)"
-      write(UnitNum,1440)
-        do imol = 1,nmol
-          write(UnitNum,1420) imol, 'X', QUAD_mm(1,imol)
-          write(UnitNum,1425)      'Y', QUAD_mm(2,imol), QUAD_mm(4,imol)
-          write(UnitNum,1425)
-     &           'Z', QUAD_mm(3,imol), QUAD_mm(5,imol), QUAD_mm(6,imol)
-c
-          write(UnitNum,1430) imol, 'X', QUADcm_mm(1,imol)
-          write(UnitNum,1435)  'Y', QUADcm_mm(2,imol), QUADcm_mm(4,imol)
-          write(UnitNum,1435)       'Z', QUADcm_mm(3,imol),
-     &                             QUADcm_mm(5,imol), QUADcm_mm(6,imol)
-          if(imol .lt. nmol) write(UnitNum,*)
-        enddo ! imol = 1,nmol
-      write(UnitNum,*)
-      write(UnitNum,'(x,a)')
-     &  "Traceless Quadrupole moments (Buckingham)"
-     & //" in principal axes computed:"
-      write(UnitNum,'(x,a)')
-     &  "-with respect to the origin of coordinates (ooc)"
-      write(UnitNum,'(x,a)')"-with respect to the center of mass (com)"
-      write(UnitNum,1440)
-        do imol = 1,nmol
-          write(UnitNum,1420) imol, 'X', diag_QUAD_mm(1,imol)
-          write(UnitNum,1425)       'Y', diag_QUAD_mm(2,imol),
-     &                        diag_QUAD_mm(4,imol)
-          write(UnitNum,1425)       'Z', diag_QUAD_mm(3,imol),
-     &                        diag_QUAD_mm(5,imol), diag_QUAD_mm(6,imol)
-c
-          write(UnitNum,1430) imol, 'X', diag_QUADcm_mm(1,imol)
-          write(UnitNum,1435)       'Y', diag_QUADcm_mm(2,imol),
-     &                        diag_QUADcm_mm(4,imol)
-          write(UnitNum,1435)       'Z', diag_QUADcm_mm(3,imol),
-     &                    diag_QUADcm_mm(5,imol), diag_QUADcm_mm(6,imol)
-          if(imol .lt. nmol) write(UnitNum,*)
-        enddo ! imol = 1,nmol
-
- 1345 FORMAT(x,'#MEP',4x,'X',10x,'Y',10x,'Z')
- 1355 FORMAT(x,i3,3(x,F10.5))
- 1400 FORMAT(x,i3,x,'ooc',x,F10.5,x,3(x,F10.5))
- 1405 FORMAT(x,'#MEP',9x,'D',10x,'Dx',9x,'Dy',9x,'Dz')
- 1410 FORMAT(x,i3,x,'com',x,F10.5,x,3(x,F10.5))
- 1420 FORMAT(x,i3,x,'ooc',x,1a,3(x,F10.5))
- 1425 FORMAT(x,8x,1a,3(x,F10.5))
- 1430 FORMAT(x,i3,x,'com',x,1a,3(x,F10.5))
- 1435 FORMAT(x,8x,1a,3(x,F10.5))
- 1440 FORMAT(x,'#MEP',10x,'X',10x,'Y',10x,'Z')
-
-      return
-      end subroutine wrt_stat_mom
 c-------------------------------------------------------------------------
       SUBROUTINE wrt_pot
 C************************************************************************
@@ -2747,17 +2028,15 @@ c read in the electrostatic potential points used in the fitting,
 c calculate esp using existing charges, and write out both esp's & residual
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, iuniq,NESP,natpl1, Ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10), keywd( 4,4)
       character*8   TITLE,     keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -2766,139 +2045,53 @@ C       parameter (maxmol = 400)
       COMMON/propty/ CO(3,maxq), CMAS(3), DIPOL(3), dipmom, QUAD(6)
       COMMON/mltmol/ wtmol(maxmol), moleqv(4,maxmol), ibeg(maxmol),
      &               iend(maxmol), nmol
-      common /files/ input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     .               owrite,esqpotpdb,esmpotpdb
-      character*80 input,output,qin,qout,punch,espot,qwts,esout,espdb,
-     &             esqpotpdb,esmpotpdb
+      common /files/ input,output,qin,qout,punch,espot,qwts,esout,
+     .               owrite
+      character*80 input,output,qin,qout,punch,espot,qwts,esout
       character owrite
 c
       DATA AU2CAL/627.5095d0/,BOHR/0.52917725d0/
 c
-      integer :: NAtMol, NespMol, ChMol, CurrAt, LineCount, ResSeq
-      integer :: CountIesp
-      character*80 ::  NameMol
-      character*2 :: CharAt, get_CharAt, CharNumAt
-      character*4 :: LabelAt
-      character*3 :: CharNumIesp
+c open the file containing the qm esp points & read in the no. of points
 c
-c Open espot and esout files
+      call amopen(10, ESPOT,'O','F','R')
+      rewind(10)
+      call amopen(20, ESOUT,owrite,'F','W')
+      read(10,'(2i5)') idum,nesp
+      ssvkcl= ssvpot*au2cal*au2cal
+      chikcl= chipot*au2cal*au2cal
+      write( 20, '(i5,i6,4x,2f20.10)') nesp, izan(1), ssvkcl, chikcl
 c
-      call amopen(10,ESPOT,'O','F','R')
-      rewind(10)
-      call amopen(20,ESOUT,'U','F','W')
-      call amopen(30,ESPDB,'U','F','W')
-      call amopen(40,ESQPOTPDB,'U','F','W')
-      call amopen(50,ESMPOTPDB,'U','F','W')
-
-      do imol=1,nmol
-        read(10,*,end=930) NAtMol, NespMol, ChMol, NameMol
-        write(20,334) imol,NAtMol, NespMol, ChMol, trim(NameMol)
- 334    format(x,"#MEP = ",i3," NAt = ",i3," NEsp = ",i6,
-     &         " Charge = ",i3,x,a)
-c Skip coordinates of atoms
-        do iat=1,NAtMol
-          read(10,*)
-        enddo ! iat=1,NAtMol
-        do iesp=1,NespMol
-          read(10,*,end=930) espqmi, xi, yi, zi
-          espclc= 0.0d0
-          do iat=ibeg(imol),iend(imol)
-            Xik = xi - CRD(1,iat)
-            Yik = yi - CRD(2,iat)
-            Zik = zi - CRD(3,iat)
-            espclc = espclc + qcal(iat) / dsqrt(Xik*Xik+Yik*Yik+Zik*Zik)
-          enddo ! iat=ibeg(imol),iend(imol)
-          vresid = espqmi - espclc
-!          xa = xi * BOHR
-!          ya = yi * BOHR
-!          za = zi * BOHR
-          xa = xi
-          ya = yi
-          za = zi
-          write(20,'(3f10.5,3f12.5)')xa,ya,za,espqmi,espclc,vresid
-        enddo ! iesp=1,NespMol
-      enddo ! imol=1,nmol
-
-c Write evrything again in PDB format. Back to the top of espot file.
-      rewind(10)
-      LineCount = 0
-      do imol=1,nmol
-        write(30,'(a6,4x,i4)') 'MODEL ',imol
-        write(40,'(a6,4x,i4)') 'MODEL ',imol
-        write(50,'(a6,4x,i4)') 'MODEL ',imol
-        read(10,*,end=930) NAtMol, NespMol, ChMol, NameMol
-        ResSeq = 1
-        do iat=1,NAtMol
-          read(10,*,end=930) xi,yi,zi
-          xa = xi * BOHR
-          ya = yi * BOHR
-          za = zi * BOHR
-          CurrAt = ibeg(imol) + iat - 1
-          CharAt = get_CharAt(IZAN(CurrAt))
-          write(CharNumAt,'(i2)') iat
-          LabelAt = trim(CharAt)//adjustl(CharNumAt)
-          LineCount = LineCount + 1
-          write(30,555)'ATOM  ',LineCount,trim(LabelAt),' ',
-     &                 'MOL',' ',ResSeq,' ',
-     &         xa,ya,za,1.00,qcal(CurrAt),trim(CharAt),' '
-          write(40,555)'ATOM  ',LineCount,trim(LabelAt),' ',
-     &                 'MOL',' ',ResSeq,' ',
-     &         xa,ya,za,1.00,qcal(CurrAt),trim(CharAt),' '
-          write(50,555)'ATOM  ',LineCount,trim(LabelAt),' ',
-     &                 'MOL',' ',ResSeq,' ',
-     &         xa,ya,za,1.00,qcal(CurrAt),trim(CharAt),' '
- 555     format(A6,I5,1X,A4,A1,A3,1X,A1,I4,A1,3X,3F8.3,2F6.2,10X,2A2)
-        enddo ! iat=1,NAtMol
-        CountIesp = 0
-        ResSeq = 2
-        do iesp=1,NespMol
-          read(10,*,end=930) espqmi, xi, yi, zi
-          CountIesp = CountIesp + 1
-          if(CountIesp .eq. 1000) then
-            ResSeq = ResSeq + 1
-            CountIesp = 1
-          endif ! (CountIesp .eq. 1000)
-          espclc= 0.0d0
-          do iat=ibeg(imol),iend(imol)
-            Xik = xi - CRD(1,iat)
-            Yik = yi - CRD(2,iat)
-            Zik = zi - CRD(3,iat)
-            espclc = espclc + qcal(iat) / dsqrt(Xik*Xik+Yik*Yik+Zik*Zik)
-          enddo ! iat=ibeg(imol),iend(imol)
-          vresid = espqmi - espclc
-          xa = xi * BOHR
-          ya = yi * BOHR
-          za = zi * BOHR
-          CharAt = 'X'
-          write(CharNumIesp,'(i3)') CountIesp
-          LabelAt = trim(CharAt)//adjustl(CharNumIesp)
-          LineCount = LineCount + 1
-c Output the relative residual
-          write(30,555)'ATOM  ',LineCount,trim(LabelAt),' ',
-     &                 'POT',' ',ResSeq,' ',
-     &         xa,ya,za,1.00,vresid/espqmi,trim(CharAt),' '
-c Output the quantum electrostatic potential
-          write(40,555)'ATOM  ',LineCount,trim(LabelAt),' ',
-     &                 'POT',' ',ResSeq,' ',
-     &         xa,ya,za,1.00,espqmi,trim(CharAt),' '
-c Output the mm electrostatic potential
-          write(50,555)'ATOM  ',LineCount,trim(LabelAt),' ',
-     &                 'POT',' ',ResSeq,' ',
-     &         xa,ya,za,1.00,espclc,trim(CharAt),' '
-        enddo ! iesp=1,NespMol
-        write(30,'(6a)')'ENDMDL'
-        write(40,'(6a)')'ENDMDL'
-        write(50,'(6a)')'ENDMDL'
-      enddo ! imol=1,nmol
-
+c build up matrix elements Ajk according to (SUMi 1/Rik SUMj 1/Rij)
+c
+      do i = 1,idum
+         read(10,100, end=930)  xi, yi, zi
+ 100     format(17x,3e16.7)
+      enddo
+      do i= 1,nesp
+         read(10,101, end=930) espqmi, xi, yi, zi
+ 101     format(1x,4e16.7)
+         espclc= 0.0d0
+         do k=1,iuniq
+           Xik    = xi - CRD(1,k)
+           Yik    = yi - CRD(2,k)
+           Zik    = zi - CRD(3,k)
+           espclc= espclc + qcal(k)/ SQRT( Xik*Xik + Yik*Yik + Zik*Zik)
+         enddo
+         vresid= espqmi - espclc
+         xa= xi*BOHR
+         ya= yi*BOHR
+         za= zi*BOHR
+         espclc= espclc*AU2CAL
+         espqmi= espqmi*AU2CAL
+         vresid= vresid*AU2CAL
+         write( 20, '(3f10.5, 3f12.5)') xa,ya,za, espqmi,espclc,vresid
+      enddo
+c
       close(10)
       close(20)
-      close(30)
-      close(40)
-      close(50)
-
+c
       return
-C
   930 write (6, *) ' unexpected eof in ', espot
       stop
       end
@@ -2910,17 +2103,16 @@ c
 c  called from Main
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      include 'shared_variables.h'
-C       parameter (maxq   = 8000)
-C       parameter (maxlgr = 900)
-C       parameter (maxmol = 400)
+      parameter (maxq   = 8000)
+      parameter (maxlgr = 900)
+      parameter (maxmol = 400)
+c
       COMMON/IOSTUF/inopt,ioutopt,IQOPT,iunits
       COMMON/INFOA/NAT, IUNIQ,NESP,natpl1, ihfree,irstrnt
       COMMON/RUNLAB/TITLE(10),keywd( 4,4)
       character*8   TITLE,    keywd
       COMMON/ESPCOM/apot(maxq,maxq), bpot(maxq), grad(maxq),
-     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg,
-     &               SigmaEpsi_pe,SigmaEpsi2_pe,cpot_pe(maxq),RSquare
+     &               awt(maxq,maxq), bwt(maxq), ssvpot,chipot,vavrg
       COMMON/CALCUL/ QCAL(maxq), a(maxq,maxq), b(maxq),
      & qwtval(maxq), iwttyp(maxq), iqcntr(maxq)
       common/LAGRNG/ grpchg(maxlgr), lgrcnt(maxlgr,maxq), nlgrng
@@ -5319,38 +4511,3 @@ c
       return
       end
 c***********************************************************************
-      character*2 function get_CharAt(ZAt)
-
-      implicit none
-
-      integer :: ZAt, IAt
-
-      character*2 :: ChemSymb(0:106)
-      
-      DATA (ChemSymb(IAt),IAt=0,106) /
-     &   'LP',
-     &   'H ','He',
-     &   'Li','Be','B ','C ','N ','O ','F ','Ne',
-     &   'Na','Mg','Al','Si','P ','S ','Cl','Ar',
-     &   'K ','Ca','Sc','Ti','V ','Cr','Mn','Fe',
-     &   'Co','Ni','Cu','Zn','Ga','Ge','As','Se','Br','Kr',
-     &   'Rb','Sr','Y ','Zr','Nb','Mo','Tc','Ru',
-     &   'Rh','Pd','Ag','Cd','In','Sn','Sb','Te','I ','Xe',
-     &   'Cs','Ba',
-     &   'La','Ce','Pr','Nd','Pm','Sm','Eu','Gd','Tb','Dy',
-     &   'Ho','Er','Tm','Yb','Lu',
-     &   'Hf','Ta','W ','Re','Os','Ir','Pt','Au','Hg','Ti',
-     &   'Pb','Bi','Po','At','Rn',
-     &   'Fr','Ra',
-     &   'Ac','Th','Pa','U ','Np','Pu','Am','Cm','Bk','Cf',
-     &   'Es','Fm','Md','No','Lr',
-     &   'Rf','Db','Sg' /
-
-      if(Zat .lt. 0 .or. ZAt .gt. 106) then
-        write(*,*) "STOP! Unknown atom! ZAT = ",ZAt
-        stop
-      endif !(Zat .lt 0 .or. ZAt .gt. 106)
-      get_CharAt = ChemSymb(ZAt)
-
-      return
-      end function get_CharAt
