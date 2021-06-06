@@ -66,6 +66,17 @@ Further, for the sake of producing portable binaries, the `resp` program can be 
 The libraries linked statically are `libgfortran` and `libquadmath`.
 You are required to provide the path to where these static libraries can be found by setting the `RESP_VPATH` variable.
 
+### Install alternate version
+
+For reproducibility, you may want to install another version of `restrained-ESP-fit`.
+For example, there are some input format differences between `resp` versions `2.2` and `2.4`.
+To install the latest patch version of `2.2`, run:
+
+
+```
+pip3 install 'restrained-ESP-fit>=2.2.0,<2.3.0'
+```
+
 ## Run
 
 Currently, the only interface to the program is invoking the `restrained-ESP-fit` script.
