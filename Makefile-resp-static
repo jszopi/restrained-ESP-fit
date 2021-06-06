@@ -2,15 +2,10 @@
 # correctly produces a static link on all tested platforms.
 FC = $(or $(RESP_COMPILER),gcc)
 
-FLAGS = -c -O2 -v
-# -mcmodel=medium
-# option for gfortran
-# allows handling of a larger number of MEP on 64 bit system
-# FLAGS = -c -mcmodel=medium -O2
+FLAGS = -v
 
 OBJS= resp.o
 SRCS= resp.f
-LIB= shared_variables.h
 
 # A trick to statically link selected libraries, which works on macOS, since
 # the -Wl,Bstatic/dynamic and -l:libgfortran.a approaches only work with the
@@ -22,10 +17,7 @@ STATICLIBS = -lgfortran -lquadmath
 
 resp:	$(OBJS) $(STATICLIBS)
 	# -lm is needed on Linux per https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539#c3
-	$(FC) $^ -lm -o resp
-
-$(OBJS): $(SRCS) $(LIB)
-	$(FC) $(FLAGS) $(SRCS)
+	$(FC) $(FLAGS) $^ -lm -o resp
 
 clean:
 	rm -rf $(OBJS) resp
