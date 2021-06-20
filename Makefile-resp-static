@@ -1,6 +1,6 @@
 # Fortran compiler. Only gfortran, specifically its invocation through gcc,
 # correctly produces a static link on all tested platforms.
-FC = $(or $(RESP_COMPILER),gcc)
+FC = gfortan
 
 FLAGS = -c -O2 -v
 # -mcmodel=medium
