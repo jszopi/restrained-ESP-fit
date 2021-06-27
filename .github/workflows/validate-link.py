@@ -92,7 +92,7 @@ def ensure_supported_link_deps_util(link_deps_util):
             [link_deps_util, "--version"], capture_output=True, check=True, text=True
         )
     except subprocess.CalledProcessError as e:
-        print(f"ERROR: {e.stderr}", file=sys.stderr)
+        print(f"ERROR: {e.stderr or e.stdout}", file=sys.stderr)
         sys.exit(e.returncode)
 
     output = result.stdout if link_deps_util != "otool" else result.stderr
@@ -118,7 +118,7 @@ def get_dynamic_libraries(link_deps_util, object_file):
     try:
         result = subprocess.run(command, capture_output=True, check=True, text=True)
     except subprocess.CalledProcessError as e:
-        print(f"ERROR: {e.stderr}", file=sys.stderr)
+        print(f"ERROR: {e.stderr or e.stdout}", file=sys.stderr)
         sys.exit(e.returncode)
 
     print(f"{link_deps_util} output:\n{result.stdout}")

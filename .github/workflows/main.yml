@@ -153,6 +153,7 @@ jobs:
         echo "RESP_BINARY: $RESP_BINARY"
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
         echo "LINK_DEPS_UTIL: $LINK_DEPS_UTIL"
+        "$LINK_DEPS_UTIL" --version
         ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
 
     - name: Check if package passes validation for publishing to PyPI
