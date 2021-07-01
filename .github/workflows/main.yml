@@ -148,8 +148,12 @@ jobs:
     - name: Verify that libraries are linked into `resp` as expected
       run: |
         INSTALLED_MODULE="$(pip show restrained-ESP-fit | grep "^Location" | cut -f2 -d" ")"
+        echo "INSTALLED_MODULE: $INSTALLED_MODULE"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
+        echo "RESP_BINARY: $RESP_BINARY"
         LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
+        echo "LINK_DEPS_UTIL: $LINK_DEPS_UTIL"
+        "$LINK_DEPS_UTIL" --version
         ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
 
     - name: Check if package passes validation for publishing to PyPI
