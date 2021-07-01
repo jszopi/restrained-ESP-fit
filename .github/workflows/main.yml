@@ -89,6 +89,12 @@ jobs:
         RESP_VPATH_EXP="$(python -c "import glob ; matches = glob.glob(\"$RESP_VPATH\") ; assert len(matches) <= 1 ; print(matches[0] if matches else '')")"
         echo "Setting RESP_VPATH to $RESP_VPATH_EXP"
         echo "RESP_VPATH=$RESP_VPATH_EXP" >> $GITHUB_ENV
+        
+    - name: Check gfortran version on macOS
+      if: ${{ startsWith(matrix.build, 'macos') }}
+      run: |
+        ls -l /usr/local/bin/gfortran-11
+        /usr/local/bin/gfortran-11 --version
 
     - name: Build sdist
       if: ${{ !startsWith(matrix.build, 'manylinux') }}
