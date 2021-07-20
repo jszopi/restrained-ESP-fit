@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [ quick-linux, macos ]
+        build: [ quick-linux, macos, macos-11 ]
         python-version: [3.9]
         static-link: [0, 1]
         include:
@@ -52,6 +52,21 @@ jobs:
             compiler: /usr/local/bin/gfortran-11
             expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
 
+          - build: macos-11
+            os: macos-11
+            static-link: 1
+            # The flag was already being set, but I'm not sure what was setting
+            # it, so I'd rather hard-code it in case the behaviour changes.
+            compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=10.15'
+            vpath: /usr/local/Cellar/gcc/11.*/lib/gcc/11
+            expected-dyn-libs: 'libSystem libgcc_s'
+
+          - build: macos-11
+            os: macos-11
+            static-link: 0
+            compiler: /usr/local/bin/gfortran-11
+            expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
+            
           - build: manylinux
             os: ubuntu-18.04
             python-version: 3.7
