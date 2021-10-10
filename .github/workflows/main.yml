@@ -48,7 +48,7 @@ jobs:
           - build: macos11
             os: macos-10.15
             static-link: 1
-            wheel-platform: macosx_10_15_x86_64
+            wheel-platform: macosx_11_0_x86_64
             # The flag was already being set, but I'm not sure what was setting
             # it, so I'd rather hard-code it in case the behaviour changes.
             compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=10.15'
