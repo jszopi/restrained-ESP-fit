@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [ quick-linux, macos ]
+        build: [ quick-linux, macos10, macos11 ]
         python-version: [3.9]
         static-link: [0, 1]
         include:
@@ -35,7 +35,17 @@ jobs:
             vpath: /usr/lib/gcc/x86_64-linux-gnu/7
             expected-dyn-libs: 'libm libgcc_s libc'
 
-          - build: macos
+          - build: macos10
+            os: macos-10.15
+            static-link: 1
+            wheel-platform: macosx_10_15_x86_64
+            # The flag was already being set, but I'm not sure what was setting
+            # it, so I'd rather hard-code it in case the behaviour changes.
+            compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=10.15'
+            vpath: /usr/local/Cellar/gcc/11.*/lib/gcc/11
+            expected-dyn-libs: 'libSystem libgcc_s'
+
+          - build: macos11
             os: macos-10.15
             static-link: 1
             wheel-platform: macosx_10_15_x86_64
@@ -149,7 +159,7 @@ jobs:
       run: |
         INSTALLED_MODULE="$(pip show restrained-ESP-fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
-        LINK_DEPS_UTIL="${{ matrix.build == 'macos' && 'otool' || 'ldd' }}"
+        LINK_DEPS_UTIL="${{ matrix.build == 'macos*' && 'otool' || 'ldd' }}"
         ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
 
     - name: Check if package passes validation for publishing to PyPI
