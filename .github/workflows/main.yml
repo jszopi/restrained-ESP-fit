@@ -48,7 +48,7 @@ jobs:
           - build: macos11
             os: macos-11
             static-link: 1
-            wheel-platform: macosx_11_3_arm64
+            wheel-platform: macosx_11_0_arm64
             # The flag was already being set, but I'm not sure what was setting
             # it, so I'd rather hard-code it in case the behaviour changes.
             compiler: '/usr/local/bin/gcc-11 -mmacosx-version-min=11.0'
@@ -65,7 +65,7 @@ jobs:
           - build: macos11
             os: macos-11
             static-link: 0
-            wheel-platform: macosx_11_3_arm64
+            wheel-platform: macosx_11_0_arm64
             compiler: /usr/local/bin/gfortran-11
             expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
             
