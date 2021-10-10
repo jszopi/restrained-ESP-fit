@@ -68,7 +68,7 @@ jobs:
             wheel-platform: macosx_11_0_arm64
             compiler: /usr/local/bin/gfortran-11
             expected-dyn-libs: 'libSystem libgcc_s libgfortran libquadmath'
-            
+
           - build: manylinux
             os: ubuntu-18.04
             python-version: 3.7
@@ -139,9 +139,9 @@ jobs:
       env:
         PLAT: ${{ matrix.wheel-platform }}
       run: |
-        PLAT_OPTION="$(python -c "print(\"--plat=$PLAT\" if \"$PLAT\" else '')")"
+        PLAT_OPTION="$(python -c "print(\"--plat-name=$PLAT\" if \"$PLAT\" else '')")"
         echo "PLAT_OPTION: $PLAT_OPTION"
-        python -c 'import platform ; print(f"platform: platform.platform") ;'
+        python -c 'import platform ; print(f"platform: {platform.platform()}") ;'
         python setup.py bdist_wheel --python-tag py3 $PLAT_OPTION
 
     - name: Validate the created wheel(s)
