@@ -166,7 +166,7 @@ jobs:
       run: |
         INSTALLED_MODULE="$(pip show restrained-ESP-fit | grep "^Location" | cut -f2 -d" ")"
         RESP_BINARY="$INSTALLED_MODULE"/restrained_ESP_fit/build/resp
-        LINK_DEPS_UTIL="${{ matrix.build == 'macos*' && 'otool' || 'ldd' }}"
+        LINK_DEPS_UTIL="${{ (matrix.build == 'macos10' || matrix.build == 'macos11') && 'otool' || 'ldd' }}"
         ./.github/workflows/validate-link.py "$LINK_DEPS_UTIL" "$RESP_BINARY" ${{matrix.expected-dyn-libs}}
 
     - name: Check if package passes validation for publishing to PyPI
