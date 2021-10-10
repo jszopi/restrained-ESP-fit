@@ -142,6 +142,7 @@ jobs:
         PLAT_OPTION="$(python -c "print(\"--plat-name=$PLAT\" if \"$PLAT\" else '')")"
         echo "PLAT_OPTION: $PLAT_OPTION"
         which python
+        python --version
         python -c 'import platform ; print(f"platform: {platform.platform()}") ;'
         python setup.py bdist_wheel --python-tag py3 $PLAT_OPTION
 
