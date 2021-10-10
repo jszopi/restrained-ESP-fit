@@ -140,6 +140,8 @@ jobs:
         PLAT: ${{ matrix.wheel-platform }}
       run: |
         PLAT_OPTION="$(python -c "print(\"--plat=$PLAT\" if \"$PLAT\" else '')")"
+        echo "PLAT_OPTION: $PLAT_OPTION"
+        python -c "import platform ; print(f"platform: platform.platform) ;"
         python setup.py bdist_wheel --python-tag py3 $PLAT_OPTION
 
     - name: Validate the created wheel(s)
