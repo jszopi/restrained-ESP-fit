@@ -46,7 +46,7 @@ jobs:
             expected-dyn-libs: 'libSystem libgcc_s'
 
           - build: macos11
-            os: macos-10.15
+            os: macos-11
             static-link: 1
             wheel-platform: macosx_11_0_x86_64
             # The flag was already being set, but I'm not sure what was setting
